@@ -1,5 +1,6 @@
 prboom2/ICONS/icons.aps
 prboom2/release
+prboom2/build
 /build*
 /dependencies*
 

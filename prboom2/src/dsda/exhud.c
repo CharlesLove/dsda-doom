@@ -34,7 +34,7 @@ void dsda_InitExHud(patchnum_t* font) {
   HUlib_initTextLine(
     &dsda_exhud_timer.text,
     DSDA_EXHUD_X,
-    200 - g_st_height - 16,
+    200 - g_st_height - 24,
     font,
     HU_FONTSTART,
     g_cr_gray,
@@ -44,7 +44,7 @@ void dsda_InitExHud(patchnum_t* font) {
   HUlib_initTextLine(
     &dsda_exhud_max_totals.text,
     DSDA_EXHUD_X,
-    200 - g_st_height - 8,
+    200 - g_st_height - 16,
     font,
     HU_FONTSTART,
     g_cr_gray,

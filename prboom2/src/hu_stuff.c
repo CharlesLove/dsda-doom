@@ -2392,6 +2392,12 @@ void HU_Drawer(void)
     return;
 
   plr = &players[displayplayer];         // killough 3/7/98
+  
+  // display map title when ex hud is active
+  if(dsda_ExHud() && (viewheight != SCREENHEIGHT)){
+    HUlib_drawTextLine(&w_title, false);
+  }
+  
   // draw the automap widgets if automap is displayed
   if (automapmode & am_active)
   {

@@ -1,5 +1,5 @@
 # dsda-doom with LOVE
-This is my personal fork of dsda-doom. It's kept relatively up to date with the original.
+This is my personal fork of dsda-doom with minor alterations to fit my preferences. It's kept relatively up to date with the original.
 
 ### My Additions
 - The -pistolstart parameter has been ported from prboom+ um

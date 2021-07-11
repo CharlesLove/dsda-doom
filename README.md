@@ -1,5 +1,9 @@
-# dsda-doom v0.19.7
-This is a fork of prboom+ with extra tooling for demo recording and playback, with a focus on speedrunning.
+# dsda-doom with LOVE
+This is my personal fork of dsda-doom. It's kept relatively up to date with the original.
+
+### My Additions
+- The -pistolstart parameter has been ported from prboom+ um
+- When extended hud is enabled, the current map name is displayed as well. (There is clipping in Hexen and Heretic)
 
 ### Patch Notes
 - [v0.19](./patch_notes/v0.19.md)

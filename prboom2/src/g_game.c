@@ -306,7 +306,6 @@ int LeaveMap;
 static int LeavePosition;
 
 void G_DoTeleportNewMap(void);
-void G_DoSingleReborn(void);
 static void Hexen_G_DoCompleted(void);
 static void Hexen_G_DoReborn(int playernum);
 // end hexen
@@ -1387,9 +1386,6 @@ void G_Ticker (void)
       case ga_screenshot:
         M_ScreenShot();
         gameaction = ga_nothing;
-        break;
-      case ga_singlereborn:
-        G_DoSingleReborn();
         break;
       case ga_leavemap:
         G_DoTeleportNewMap();
@@ -2499,6 +2495,7 @@ void G_DoLoadGame(void)
 
   // dearchive all the modifications
   P_MapStart();
+  P_UnArchiveACS();
   P_UnArchivePlayers ();
   P_UnArchiveWorld ();
   P_TrueUnArchiveThinkers();
@@ -2532,11 +2529,6 @@ void G_DoLoadGame(void)
 
   if (hexen)
   {
-    if (!netgame)
-    {                           // Copy the base slot to the reborn slot
-      // HEXEN_TODO: SV
-      // SV_UpdateRebornSlot();
-    }
     SB_SetClassData();
   }
 
@@ -2684,6 +2676,8 @@ static void G_DoSaveGame (dboolean menu)
 
   // killough 11/98: save revenant tracer state
   *save_p++ = (gametic-basetic) & 255;
+
+  P_ArchiveACS();
 
   P_ArchivePlayers();
 
@@ -4762,8 +4756,6 @@ void G_StartNewInit(void)
       return;
     }
 
-    // HEXEN_TODO: SV
-    // SV_ClearRebornSlot();
     P_ACSInitNewGame();
     // Default the player start spot group to 0
     RebornPosition = 0;
@@ -4782,14 +4774,6 @@ void G_DoTeleportNewMap(void)
     gamestate = GS_LEVEL;
     gameaction = ga_nothing;
     RebornPosition = LeavePosition;
-}
-
-void G_DoSingleReborn(void)
-{
-    gameaction = ga_nothing;
-    // HEXEN_TODO: SV
-    // SV_LoadGame(SV_GetRebornSlot());
-    SB_SetClassData();
 }
 
 // HEXEN_TODO: should be merged with G_PlayerFinishLevel?
@@ -4890,15 +4874,7 @@ void Hexen_G_DoReborn(int playernum)
 
     if (!netgame)
     {
-        // HEXEN_TODO: SV
-        // if (SV_RebornSlotAvailable())
-        // {                       // Use the reborn code if the slot is available
-        //     gameaction = ga_singlereborn;
-        // }
-        // else
-        {                       // Start a new game if there's no reborn info
-            gameaction = ga_newgame;
-        }
+        gameaction = ga_newgame;
     }
     else
     {                           // Net-game

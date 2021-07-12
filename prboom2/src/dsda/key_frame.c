@@ -147,6 +147,7 @@ void dsda_StoreKeyFrame(byte** buffer, byte complete) {
   CheckSaveGame(1);
   *save_p++ = (gametic - basetic) & 255;
 
+  P_ArchiveACS();
   P_ArchivePlayers();
   P_ThinkerToIndex();
   P_ArchiveWorld();
@@ -231,6 +232,7 @@ void dsda_RestoreKeyFrame(byte* buffer, byte complete) {
   basetic = gametic - *save_p++;
 
   P_MapStart();
+  P_UnArchiveACS();
   P_UnArchivePlayers();
   P_UnArchiveWorld();
   P_TrueUnArchiveThinkers();
@@ -247,11 +249,6 @@ void dsda_RestoreKeyFrame(byte* buffer, byte complete) {
 
   if (hexen)
   {
-    if (!netgame)
-    {                           // Copy the base slot to the reborn slot
-      // HEXEN_TODO: SV
-      // SV_UpdateRebornSlot();
-    }
     SB_SetClassData();
   }
 

@@ -84,12 +84,6 @@ typedef struct
     size_t size;
 } thinkInfo_t;
 
-typedef struct
-{
-    thinker_t thinker;
-    sector_t *sector;
-} ssthinker_t;
-
 static int MobjCount;
 static mobj_t **MobjList;
 static mobj_t ***TargetPlayerAddrs;
@@ -124,6 +118,12 @@ static void FreeMapArchive(void)
       free(map_archive[map].buffer);
       map_archive[map].buffer = NULL;
     }
+}
+
+static dboolean SV_IsMobjThinker(thinker_t *th)
+{
+  return th->function == P_MobjThinker ||
+         (th->function == P_RemoveThinkerDelayed && th->references);
 }
 
 static void CheckBuffer(size_t size)
@@ -170,6 +170,13 @@ static int SV_ReadLong(void)
     return result;
 }
 
+static uint_64_t SV_ReadFlags(void)
+{
+    uint_64_t result;
+    SV_Read(&result, sizeof(uint_64_t));
+    return result;
+}
+
 static void *SV_ReadPtr(void)
 {
     return (void *) (intptr_t) SV_ReadLong();
@@ -195,6 +202,11 @@ static void SV_WriteWord(unsigned short val)
 static void SV_WriteLong(unsigned int val)
 {
     SV_Write(&val, sizeof(unsigned int));
+}
+
+static void SV_WriteFlags(uint_64_t val)
+{
+    SV_Write(&val, sizeof(uint_64_t));
 }
 
 static void SV_WritePtr(void *val)
@@ -257,7 +269,7 @@ static void SetMobjPtr(mobj_t **ptr, unsigned int archiveNum)
     }
     else
     {
-        *ptr = MobjList[archiveNum];
+        P_SetTarget(ptr, MobjList[archiveNum]);
     }
 }
 
@@ -272,6 +284,9 @@ static void StreamInMobjSpecials(mobj_t *mobj)
 static void StreamIn_mobj_t(mobj_t *str)
 {
     unsigned int i;
+
+    // "is the mobj marked for deletion?"
+    str->index = SV_ReadByte();
 
     // fixed_t x, y, z;
     str->x = SV_ReadLong();
@@ -346,10 +361,10 @@ static void StreamIn_mobj_t(mobj_t *str)
     str->damage = SV_ReadLong();
 
     // int flags;
-    str->flags = SV_ReadLong();
+    str->flags = SV_ReadFlags();
 
     // int flags2;
-    str->flags2 = SV_ReadLong();
+    str->flags2 = SV_ReadFlags();
 
     // specialval_t special1;
     // specialval_t special2;
@@ -409,6 +424,8 @@ static void StreamIn_mobj_t(mobj_t *str)
     {
         str->args[i] = SV_ReadByte();
     }
+
+    str->friction = ORIG_FRICTION;
 }
 
 static void StreamOutMobjSpecials(mobj_t *mobj)
@@ -426,6 +443,9 @@ static void StreamOutMobjSpecials(mobj_t *mobj)
 static void StreamOut_mobj_t(mobj_t *str)
 {
     int i;
+
+    // store "marked for deletion" flag
+    SV_WriteByte(str->thinker.function == P_RemoveThinkerDelayed);
 
     // fixed_t x, y, z;
     SV_WriteLong(str->x);
@@ -488,10 +508,10 @@ static void StreamOut_mobj_t(mobj_t *str)
     SV_WriteLong(str->damage);
 
     // int flags;
-    SV_WriteLong(str->flags);
+    SV_WriteFlags(str->flags);
 
     // int flags2;
-    SV_WriteLong(str->flags2);
+    SV_WriteFlags(str->flags2);
 
     // specialval_t special1;
     // specialval_t special2;
@@ -1291,7 +1311,7 @@ static void ArchiveWorld(void)
         SV_WriteByte(li->arg5);
         for (j = 0; j < 2; j++)
         {
-            if (li->sidenum[j] == -1)
+            if (li->sidenum[j] == NO_INDEX)
             {
                 continue;
             }
@@ -1340,7 +1360,7 @@ static void UnarchiveWorld(void)
         li->arg5 = SV_ReadByte();
         for (j = 0; j < 2; j++)
         {
-            if (li->sidenum[j] == -1)
+            if (li->sidenum[j] == NO_INDEX)
             {
                 continue;
             }
@@ -1363,7 +1383,7 @@ static void SetMobjArchiveNums(void)
     for (thinker = thinkercap.next; thinker != &thinkercap;
          thinker = thinker->next)
     {
-        if (thinker->function == P_MobjThinker)
+        if (SV_IsMobjThinker(thinker))
         {
             mobj = (mobj_t *) thinker;
             if (mobj->player)
@@ -1386,7 +1406,7 @@ static void ArchiveMobjs(void)
     for (thinker = thinkercap.next; thinker != &thinkercap;
          thinker = thinker->next)
     {
-        if (thinker->function != P_MobjThinker)
+        if (!SV_IsMobjThinker(thinker))
         {                       // Not a mobj thinker
             continue;
         }
@@ -1417,6 +1437,7 @@ static void UnarchiveMobjs(void)
     for (i = 0; i < MobjCount; i++)
     {
         MobjList[i] = Z_Malloc(sizeof(mobj_t), PU_LEVEL, NULL);
+        memset(MobjList[i], 0, sizeof(mobj_t));
     }
     for (i = 0; i < MobjCount; i++)
     {
@@ -1425,6 +1446,17 @@ static void UnarchiveMobjs(void)
 
         // Restore broken pointers.
         mobj->info = &mobjinfo[mobj->type];
+
+        // "marked for deletion"
+        if (mobj->index)
+        {
+          mobj->index = -1;
+          mobj->thinker.function = P_RemoveThinkerDelayed;
+          P_AddThinker(&mobj->thinker);
+
+          continue;
+        }
+
         P_SetThingPosition(mobj);
         mobj->floorz = mobj->subsector->sector->floorheight;
         mobj->ceilingz = mobj->subsector->sector->ceilingheight;
@@ -1436,9 +1468,24 @@ static void UnarchiveMobjs(void)
     P_InitCreatureCorpseQueue(true);    // true = scan for corpses
 }
 
-static void RestoreSSThinker(ssthinker_t *sst)
+static void RestoreFloorWaggle(floorWaggle_t *th)
 {
-    sst->sector->floordata = sst->sector->ceilingdata = sst->thinker.function;
+  th->sector->floordata = th->thinker.function;
+}
+
+static void RestoreBuildPillar(pillar_t *th)
+{
+  th->sector->floordata = th->thinker.function;
+}
+
+static void RestoreVerticalDoor(vldoor_t *th)
+{
+  th->sector->ceilingdata = th->thinker.function;
+}
+
+static void RestoreMoveFloor(floormove_t *th)
+{
+  th->sector->floordata = th->thinker.function;
 }
 
 static void RestorePlatRaise(plat_t *plat)
@@ -1456,102 +1503,102 @@ static void RestoreMoveCeiling(ceiling_t *ceiling)
 
 static thinkInfo_t ThinkerInfo[] = {
     {
-     TC_MOVE_FLOOR,
-     T_MoveFloor,
-     StreamOut_floormove_t,
-     StreamIn_floormove_t,
-     RestoreSSThinker,
-     sizeof(floormove_t)
+      TC_MOVE_FLOOR,
+      T_MoveFloor,
+      StreamOut_floormove_t,
+      StreamIn_floormove_t,
+      RestoreMoveFloor,
+      sizeof(floormove_t)
     },
     {
-     TC_PLAT_RAISE,
-     T_PlatRaise,
-     StreamOut_plat_t,
-     StreamIn_plat_t,
-     RestorePlatRaise,
-     sizeof(plat_t)
+      TC_PLAT_RAISE,
+      T_PlatRaise,
+      StreamOut_plat_t,
+      StreamIn_plat_t,
+      RestorePlatRaise,
+      sizeof(plat_t)
     },
     {
-     TC_MOVE_CEILING,
-     T_MoveCeiling,
-     StreamOut_ceiling_t,
-     StreamIn_ceiling_t,
-     RestoreMoveCeiling,
-     sizeof(ceiling_t)
+      TC_MOVE_CEILING,
+      T_MoveCeiling,
+      StreamOut_ceiling_t,
+      StreamIn_ceiling_t,
+      RestoreMoveCeiling,
+      sizeof(ceiling_t)
     },
     {
-     TC_LIGHT,
-     T_Light,
-     StreamOut_light_t,
-     StreamIn_light_t,
-     NULL,
-     sizeof(light_t)
+      TC_LIGHT,
+      T_Light,
+      StreamOut_light_t,
+      StreamIn_light_t,
+      NULL,
+      sizeof(light_t)
     },
     {
-     TC_VERTICAL_DOOR,
-     T_VerticalDoor,
-     StreamOut_vldoor_t,
-     StreamIn_vldoor_t,
-     RestoreSSThinker,
-     sizeof(vldoor_t)
+      TC_VERTICAL_DOOR,
+      T_VerticalDoor,
+      StreamOut_vldoor_t,
+      StreamIn_vldoor_t,
+      RestoreVerticalDoor,
+      sizeof(vldoor_t)
     },
     {
-     TC_PHASE,
-     T_Phase,
-     StreamOut_phase_t,
-     StreamIn_phase_t,
-     NULL,
-     sizeof(phase_t)
+      TC_PHASE,
+      T_Phase,
+      StreamOut_phase_t,
+      StreamIn_phase_t,
+      NULL,
+      sizeof(phase_t)
     },
     {
-     TC_INTERPRET_ACS,
-     T_InterpretACS,
-     StreamOut_acs_t,
-     StreamIn_acs_t,
-     NULL,
-     sizeof(acs_t)
+      TC_INTERPRET_ACS,
+      T_InterpretACS,
+      StreamOut_acs_t,
+      StreamIn_acs_t,
+      NULL,
+      sizeof(acs_t)
     },
     {
-     TC_ROTATE_POLY,
-     T_RotatePoly,
-     StreamOut_polyevent_t,
-     StreamIn_polyevent_t,
-     NULL,
-     sizeof(polyevent_t)
+      TC_ROTATE_POLY,
+      T_RotatePoly,
+      StreamOut_polyevent_t,
+      StreamIn_polyevent_t,
+      NULL,
+      sizeof(polyevent_t)
     },
     {
-     TC_BUILD_PILLAR,
-     T_BuildPillar,
-     StreamOut_pillar_t,
-     StreamIn_pillar_t,
-     RestoreSSThinker,
-     sizeof(pillar_t)
+      TC_BUILD_PILLAR,
+      T_BuildPillar,
+      StreamOut_pillar_t,
+      StreamIn_pillar_t,
+      RestoreBuildPillar,
+      sizeof(pillar_t)
     },
     {
-     TC_MOVE_POLY,
-     T_MovePoly,
-     StreamOut_polyevent_t,
-     StreamIn_polyevent_t,
-     NULL,
-     sizeof(polyevent_t)
+      TC_MOVE_POLY,
+      T_MovePoly,
+      StreamOut_polyevent_t,
+      StreamIn_polyevent_t,
+      NULL,
+      sizeof(polyevent_t)
     },
     {
-     TC_POLY_DOOR,
-     T_PolyDoor,
-     StreamOut_polydoor_t,
-     StreamIn_polydoor_t,
-     NULL,
-     sizeof(polydoor_t)
+      TC_POLY_DOOR,
+      T_PolyDoor,
+      StreamOut_polydoor_t,
+      StreamIn_polydoor_t,
+      NULL,
+      sizeof(polydoor_t)
     },
     {
-     TC_FLOOR_WAGGLE,
-     T_FloorWaggle,
-     StreamOut_floorWaggle_t,
-     StreamIn_floorWaggle_t,
-     RestoreSSThinker,
-     sizeof(floorWaggle_t)
+      TC_FLOOR_WAGGLE,
+      T_FloorWaggle,
+      StreamOut_floorWaggle_t,
+      StreamIn_floorWaggle_t,
+      RestoreFloorWaggle,
+      sizeof(floorWaggle_t)
     },
-    { TC_NULL, NULL, NULL, NULL, NULL, 0},
+    { TC_NULL, NULL, NULL, NULL, NULL, 0 },
 };
 
 static void ArchiveThinkers(void)
@@ -1591,6 +1638,7 @@ static void UnarchiveThinkers(void)
             if (tClass == info->tClass)
             {
                 thinker = Z_Malloc(info->size, PU_LEVEL, NULL);
+                memset(thinker, 0, info->size);
                 info->readFunc(thinker);
                 thinker->function = info->thinkerFunc;
                 if (info->restoreFunc)
@@ -1674,9 +1722,10 @@ static void RemoveAllThinkers(void)
     while (thinker != &thinkercap)
     {
         nextThinker = thinker->next;
-        if (thinker->function == P_MobjThinker)
+        if (SV_IsMobjThinker(thinker))
         {
             P_RemoveMobj((mobj_t *) thinker);
+            P_RemoveThinkerDelayed(thinker); // fix mobj leak
         }
         else
         {

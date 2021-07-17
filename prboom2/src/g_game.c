@@ -4141,7 +4141,7 @@ const byte* G_ReadDemoHeaderEx(const byte *demo_p, size_t size, unsigned int par
       {
         if (*demo_p & DEMOHEADER_RESPAWN)
           respawnparm = true;
-        if (*demo_p & DEMOHEADER_LONGTICS)
+        if (*demo_p & DEMOHEADER_LONGTICS || M_CheckParm("-longtics"))
           longtics = true;
         if (*demo_p & DEMOHEADER_NOMONSTERS)
           nomonsters = true;
@@ -4833,6 +4833,8 @@ void G_PlayerExitMap(int playerNumber)
 static void Hexen_G_DoCompleted(void)
 {
     int i;
+
+    totalleveltimes = players[consoleplayer].worldTimer;
 
     gameaction = ga_nothing;
 

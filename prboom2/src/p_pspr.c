@@ -616,9 +616,15 @@ void A_WeaponReady(player_t *player, pspdef_t *psp)
   if (!player->morphTics)
   {
     int angle = (128 * leveltime) & FINEMASK;
+    // Continue bobbing the player's weapon, but at a reduced rate to prevent hyper bobbing
+    // when player_bobbing is off
+    if(!player_bobbing)
+      player->bob = (FixedMul(player->momx, player->momx) + FixedMul(player->momy, player->momy)) >> 4;
     psp->sx = FRACUNIT + FixedMul(player->bob, finecosine[angle]);
     angle &= FINEANGLES / 2 - 1;
     psp->sy = WEAPONTOP + FixedMul(player->bob, finesine[angle]);
+    if(!player_bobbing)
+      player->bob = 0; // reset player bob to 0 like normal
   }
 }
 

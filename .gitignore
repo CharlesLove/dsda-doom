@@ -4,6 +4,8 @@ prboom2/build
 /build*
 /dependencies*
 
+*.sh
+
 # spec files
 analysis.txt
 levelstat.txt

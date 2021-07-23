@@ -4762,7 +4762,11 @@ dboolean M_Responder (event_t* ev) {
 
     if (dsda_InputActivated(dsda_input_restart))
     {
-      if (G_ReloadLevel())
+      // Treat restart key as a player respawn when pistol starting
+      // to prevent total time from being cleared
+      if(pistolstart && singleplayer)
+        players[0].playerstate = PST_REBORN;
+      else if (G_ReloadLevel())
         return true;
     }
 

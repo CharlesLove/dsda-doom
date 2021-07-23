@@ -5,6 +5,7 @@ This is my personal fork of dsda-doom with minor alterations to fit my preferenc
 - The -pistolstart parameter has been ported from prboom+ um
 - When extended hud is enabled, the current map name is displayed as well. (There is clipping in Hexen and Heretic)
 
+# From the original dsda-doom project
 ### Patch Notes
 - [v0.19](./patch_notes/v0.19.md)
 

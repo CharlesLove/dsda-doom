@@ -617,35 +617,9 @@ void A_WeaponReady(player_t *player, pspdef_t *psp)
   if (!player->morphTics)
   {
     int angle = (128 * leveltime) & FINEMASK;
-    // Temporarily set and use player bob calculations so that the weapon will continue bobbing
-    // whether or not player_bobbing is active
-    if(!player_bobbing)
-    {
-      player->bob = (FixedMul(player->momx, player->momx) + FixedMul(player->momy, player->momy)) >> 2;
-      if (!prboom_comp[PC_PRBOOM_FRICTION].state &&
-        compatibility_level >= boom_202_compatibility &&
-        compatibility_level <= lxdoom_1_compatibility &&
-        player->mo->friction > ORIG_FRICTION) // ice?
-      {
-        if (player->bob > (MAXBOB >> 2))
-          player->bob = MAXBOB >> 2;
-      }
-      else
-      {
-        if (player->bob > MAXBOB)
-          player->bob = MAXBOB;
-      }
-      psp->sx = FRACUNIT + FixedMul(player->bob, finecosine[angle]);
-      angle &= FINEANGLES / 2 - 1;
-      psp->sy = WEAPONTOP + FixedMul(player->bob, finesine[angle]);
-      player->bob = 0;
-    }
-  else
-    {
-      psp->sx = FRACUNIT + FixedMul(player->bob, finecosine[angle]);
-      angle &= FINEANGLES / 2 - 1;
-      psp->sy = WEAPONTOP + FixedMul(player->bob, finesine[angle]);
-    }
+    psp->sx = FRACUNIT + FixedMul(player->bob, finecosine[angle]);
+    angle &= FINEANGLES / 2 - 1;
+    psp->sy = WEAPONTOP + FixedMul(player->bob, finesine[angle]);
   }
 }
 

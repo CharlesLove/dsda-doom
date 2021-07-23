@@ -179,11 +179,8 @@ void P_CalcHeight (player_t* player)
 
   if (mbf_features)
   {
-    if (player_bobbing)
-    {
-      player->bob = (FixedMul(player->momx, player->momx) +
+    player->bob = (FixedMul(player->momx, player->momx) +
                      FixedMul(player->momy, player->momy)) >> 2;
-    }
   }
   else
   {
@@ -225,7 +222,11 @@ void P_CalcHeight (player_t* player)
   }
 
   angle = (FINEANGLES / 20 * leveltime) & FINEMASK;
-  bob = FixedMul(player->bob / 2, finesine[angle]);
+
+  if(!player_bobbing)
+    bob = 0;
+  else
+    bob = FixedMul(player->bob / 2, finesine[angle]);
 
   // move viewheight
 

@@ -53,6 +53,7 @@
 #define RAISESPEED   (FRACUNIT*6)
 #define WEAPONBOTTOM (FRACUNIT*128)
 #define WEAPONTOP    (FRACUNIT*32)
+#define MAXBOB  0x100000
 
 #define BFGCELLS bfgcells        /* Ty 03/09/98 externalized in p_inter.c */
 
@@ -616,15 +617,35 @@ void A_WeaponReady(player_t *player, pspdef_t *psp)
   if (!player->morphTics)
   {
     int angle = (128 * leveltime) & FINEMASK;
-    // Continue bobbing the player's weapon, but at a reduced rate to prevent hyper bobbing
-    // when player_bobbing is off
+    // Temporarily set and use player bob calculations so that the weapon will continue bobbing
+    // whether or not player_bobbing is active
     if(!player_bobbing)
-      player->bob = (FixedMul(player->momx, player->momx) + FixedMul(player->momy, player->momy)) >> 4;
-    psp->sx = FRACUNIT + FixedMul(player->bob, finecosine[angle]);
-    angle &= FINEANGLES / 2 - 1;
-    psp->sy = WEAPONTOP + FixedMul(player->bob, finesine[angle]);
-    if(!player_bobbing)
-      player->bob = 0; // reset player bob to 0 like normal
+    {
+      player->bob = (FixedMul(player->momx, player->momx) + FixedMul(player->momy, player->momy)) >> 2;
+      if (!prboom_comp[PC_PRBOOM_FRICTION].state &&
+        compatibility_level >= boom_202_compatibility &&
+        compatibility_level <= lxdoom_1_compatibility &&
+        player->mo->friction > ORIG_FRICTION) // ice?
+      {
+        if (player->bob > (MAXBOB >> 2))
+          player->bob = MAXBOB >> 2;
+      }
+      else
+      {
+        if (player->bob > MAXBOB)
+          player->bob = MAXBOB;
+      }
+      psp->sx = FRACUNIT + FixedMul(player->bob, finecosine[angle]);
+      angle &= FINEANGLES / 2 - 1;
+      psp->sy = WEAPONTOP + FixedMul(player->bob, finesine[angle]);
+      player->bob = 0;
+    }
+    else
+    {
+      psp->sx = FRACUNIT + FixedMul(player->bob, finecosine[angle]);
+      angle &= FINEANGLES / 2 - 1;
+      psp->sy = WEAPONTOP + FixedMul(player->bob, finesine[angle]);
+    }
   }
 }
 

@@ -616,10 +616,12 @@ void A_WeaponReady(player_t *player, pspdef_t *psp)
   // bob the weapon based on movement speed
   if (!player->morphTics)
   {
-    int angle = (128 * leveltime) & FINEMASK;
-    psp->sx = FRACUNIT + FixedMul(player->bob, finecosine[angle]);
-    angle &= FINEANGLES / 2 - 1;
-    psp->sy = WEAPONTOP + FixedMul(player->bob, finesine[angle]);
+    if(weapon_swaying){
+      int angle = (128 * leveltime) & FINEMASK;
+      psp->sx = FRACUNIT + FixedMul(player->bob, finecosine[angle]);
+      angle &= FINEANGLES / 2 - 1;
+      psp->sy = WEAPONTOP + FixedMul(player->bob, finesine[angle]);
+    }
   }
 }
 

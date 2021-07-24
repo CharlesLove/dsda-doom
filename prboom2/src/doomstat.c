@@ -76,6 +76,9 @@ int  weapon_recoil = 0;              // weapon recoil                   // phare
 int player_bobbing;  // whether player bobs or not          // phares 2/25/98
 int default_player_bobbing;  // killough 3/1/98: make local to each game
 
+int weapon_swaying;  // whether weapon sways or not
+int default_weapon_swaying;  // make local to each game
+
 int monsters_remember = 1;          // killough 3/1/98
 
 int monster_infighting=1;       // killough 7/19/98: monster<=>monster attacks

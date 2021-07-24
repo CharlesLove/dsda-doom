@@ -2883,7 +2883,8 @@ void G_ReloadDefaults(void)
   weapon_recoil = options->weapon_recoil;    // weapon recoil
 
   player_bobbing = default_player_bobbing;  // whether player bobs or not
-
+  weapon_swaying = default_weapon_swaying;  // whether weapon sways or not
+  
   variable_friction = 1;
   allow_pushers     = 1;
   monsters_remember = options->monsters_remember; // remember former enemies

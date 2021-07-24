@@ -2757,6 +2757,7 @@ static const char *weapon_attack_alignment_strings[] = {
 
 enum {           // killough 10/98: enum for y-offset info
   weap_bobbing,
+  weap_swaying,
   weap_attack_alignment,
   weap_stub1,
   weap_pref1,
@@ -2781,6 +2782,7 @@ setup_menu_t* weap_settings[] =
 setup_menu_t weap_settings1[] =  // Weapons Settings screen
 {
   {"ENABLE VIEW BOBBING",S_YESNO,m_null,WP_X, WP_Y+weap_bobbing*8, {"player_bobbing"}},
+  {"ENABLE WEAPON SWAY",S_YESNO,m_null,WP_X, WP_Y+weap_swaying*8, {"weapon_swaying"}},
   {"WEAPON ATTACK ALIGNMENT",S_CHOICE,m_null,WP_X, WP_Y+weap_attack_alignment*8, {"weapon_attack_alignment"}, 0, NULL, weapon_attack_alignment_strings},
 
   {"1ST CHOICE WEAPON",S_WEAP,m_null,WP_X,WP_Y+weap_pref1*8, {"weapon_choice_1"}},

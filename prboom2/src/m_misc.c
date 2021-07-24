@@ -333,6 +333,8 @@ default_t defaults[] =
    def_int,ss_none}, // selects default skill 1=TYTD 2=NTR 3=HMP 4=UV 5=NM
   {"player_bobbing",{&default_player_bobbing},{1},0,1,         // phares 2/25/98
    def_bool,ss_weap, &player_bobbing},
+  {"weapon_swaying",{&default_weapon_swaying},{1},0,1,
+   def_bool,ss_weap, &weapon_swaying},
   {"weapon_attack_alignment",{&weapon_attack_alignment},{0},0,3,         // phares 2/25/98
    def_int,ss_weap, &weapon_attack_alignment},
 

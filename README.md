@@ -4,8 +4,9 @@ This is my personal fork of dsda-doom with minor alterations to fit my preferenc
 ### My Additions
 - The -pistolstart parameter has been ported from prboom+ um.
 - Restarting the map while pistol starting no longer clears the total time.
-- Seperate toggles for view bob and weapon sway.
-- When extended hud is enabled, the current map name is displayed as well. (There is clipping in Hexen and Heretic)
+- View bob and weapon sway are now seperate toggles.
+- Option to only display crosshair on target.
+- When extended hud is enabled, the current map name is displayed as well.
 
 # From the original dsda-doom project
 ### Patch Notes

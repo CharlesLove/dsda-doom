@@ -121,6 +121,7 @@ int hudadd_crosshair_health;
 int hudadd_crosshair_target;
 int hudadd_crosshair_target_color;
 int hudadd_crosshair_lock_target;
+int hudadd_crosshair_show_target;
 int movement_strafe50;
 int movement_shorttics;
 int movement_strafe50onturns;

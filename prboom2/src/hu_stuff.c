@@ -2340,6 +2340,10 @@ void HU_draw_crosshair(void)
       if (dsda_CrosshairTarget())
         cm = hudadd_crosshair_target_color;
     }
+    else if(dsda_CrosshairShowTarget())
+    {
+      return;
+    }
   }
 
   SetCrosshairTarget();

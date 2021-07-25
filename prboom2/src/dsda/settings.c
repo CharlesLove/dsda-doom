@@ -178,6 +178,10 @@ dboolean dsda_CrosshairLockTarget(void) {
   return hudadd_crosshair_lock_target && !dsda_StrictMode();
 }
 
+dboolean dsda_CrosshairShowTarget(void) {
+  return hudadd_crosshair_show_target && !dsda_StrictMode();
+}
+
 dboolean dsda_PainPalette(void) {
   return dsda_StrictMode() || palette_ondamage;
 }

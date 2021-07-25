@@ -1120,7 +1120,10 @@ void I_UpdateVideoMode(void)
   int screen_multiply;
   int actualheight;
   const dboolean novsync = M_CheckParm("-timedemo") || \
-                           M_CheckParm("-fastdemo");
+                           M_CheckParm("-fastdemo") ||
+                           ((V_GetMode() == VID_MODE8 ||
+                           V_GetMode() == VID_MODE32) &&
+                           !exclusive_fullscreen);
 
   if(sdl_window)
   {

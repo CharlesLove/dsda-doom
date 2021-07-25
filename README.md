@@ -1,10 +1,10 @@
-# dsda-doom with LOVE
+# From DOOM with LOVE
 This is my personal fork of dsda-doom with minor alterations to fit my preferences. It's kept relatively up to date with the original.
 
 ### My Additions
 - The -pistolstart parameter has been ported from prboom+ um.
 - Restarting the map while pistol starting no longer clears the total time.
-- Weapons will continue to bob even when view bob is disabled.
+- Seperate toggles for view bob and weapon sway.
 - When extended hud is enabled, the current map name is displayed as well. (There is clipping in Hexen and Heretic)
 
 # From the original dsda-doom project

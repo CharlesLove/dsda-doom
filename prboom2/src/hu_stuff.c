@@ -2393,15 +2393,10 @@ void HU_Drawer(void)
 
   plr = &players[displayplayer];         // killough 3/7/98
   
-  // display map title when ex hud is active
-  if(dsda_ExHud() && (viewheight != SCREENHEIGHT)){
-    HUlib_drawTextLine(&w_title, false);
-  }
-  
   // draw the automap widgets if automap is displayed
   if (automapmode & am_active)
   {
-    // Hide title if automap in overlay mode and adv / ex hud is active
+    // Show title if automap not in overlay mode and adv / ex hud is not active
     if (!(automapmode & am_overlay) || ((viewheight != SCREENHEIGHT) && !dsda_ExHud()))
     {
       // map title
@@ -2599,6 +2594,11 @@ void HU_Drawer(void)
   HUlib_drawIText(&w_chat);
 
   dsda_DrawHud();
+
+  // display map title when ex hud is active
+  if(dsda_ExHud() && (viewheight != SCREENHEIGHT)){
+    HUlib_drawTextLine(&w_title, false);
+  }
 }
 
 //

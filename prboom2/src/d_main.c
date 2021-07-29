@@ -148,6 +148,17 @@ int ffmap;
 
 dboolean advancedemo;
 
+// Framerate Capping Variables
+// Current implementation loses some accuracy
+// at higher framerates (past 60fps)
+// Ex: max of 300 is roughly 260-310fps in practice
+// Still, it does it's job of preventing 1000+ fps
+// which is unnessecarilly expensive
+unsigned int startTicks = 0;
+unsigned int endTicks = 0;
+const int MAX_FRAMES_PER_SECOND = 300; // 300 fps
+const float SCREEN_TICKS_PER_FRAME = 1000.0f / MAX_FRAMES_PER_SECOND;
+
 //jff 4/19/98 list of standard IWAD names
 const char *const standard_iwads[]=
 {
@@ -290,6 +301,8 @@ void D_Display (fixed_t frac)
   static gamestate_t oldgamestate = -1;
   dboolean wipe;
   dboolean viewactive = false, isborder = false;
+
+  startTicks = SDL_GetTicks();
 
   // e6y
   if (doSkip)
@@ -466,13 +479,21 @@ void D_Display (fixed_t frac)
     wipe_EndScreen();
     D_Wipe();
   }
-
+  
+  // Used for setting an upper limit for framerate
+  endTicks = SDL_GetTicks() - startTicks;
+  if(endTicks < SCREEN_TICKS_PER_FRAME)
+  {
+    //Wait remaining time
+    SDL_Delay(floor(SCREEN_TICKS_PER_FRAME) - endTicks);
+  }
+  
   // e6y
   // Don't thrash cpu during pausing or if the window doesnt have focus
   if ( (paused && !walkcamera.type) || (!window_focused) ) {
     I_uSleep(5000);
   }
-
+  
   I_EndDisplay();
 }
 

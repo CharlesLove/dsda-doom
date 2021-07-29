@@ -1346,7 +1346,6 @@ static void UnarchiveWorld(void)
         sec->seqType = SV_ReadWord();
         sec->ceilingdata = 0;
         sec->floordata = 0;
-        sec->lightingdata = 0;
         sec->soundtarget = 0;
     }
     for (i = 0, li = lines; i < numlines; i++, li++)
@@ -1931,6 +1930,9 @@ void SV_MapTeleport(int map, int position)
     int oldKeys[NUMCARDS];
     int oldPieces = 0;
     int bestWeapon;
+
+    memset(oldKeys, 0, sizeof(oldKeys));
+    memset(oldWeaponowned, 0, sizeof(oldWeaponowned));
 
     if (!deathmatch)
     {

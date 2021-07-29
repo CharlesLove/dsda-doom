@@ -156,6 +156,7 @@ dboolean advancedemo;
 int startTicks = 0;
 int endTicks = 0;
 const int MAX_FRAMES_PER_SECOND = 500; // 500 fps
+const int SCREEN_TICKS_PER_FRAME = 1000 / MAX_FRAMES_PER_SECOND;
 
 //jff 4/19/98 list of standard IWAD names
 const char *const standard_iwads[]=
@@ -481,7 +482,7 @@ void D_Display (fixed_t frac)
   if(endTicks < SCREEN_TICKS_PER_FRAME)
   {
     //Wait remaining time
-    SDL_Delay(floor(SCREEN_TICKS_PER_FRAME) - endTicks);
+    SDL_Delay(SCREEN_TICKS_PER_FRAME - endTicks);
   }
   startTicks = SDL_GetTicks();
   

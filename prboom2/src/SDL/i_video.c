@@ -1122,7 +1122,8 @@ void I_UpdateVideoMode(void)
   const dboolean novsync = M_CheckParm("-timedemo") || \
                            M_CheckParm("-fastdemo") ||
                            ((V_GetMode() == VID_MODE8 ||
-                           V_GetMode() == VID_MODE32) &&
+                           V_GetMode() == VID_MODE32 ||
+                           V_GetMode() == VID_MODEGL) &&
                            !exclusive_fullscreen);
 
   if(sdl_window)

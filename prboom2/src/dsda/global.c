@@ -150,6 +150,8 @@ int g_menu_cr_hilite;
 int g_menu_cr_select;
 int g_menu_cr_disable;
 
+int g_title_font_height;
+
 const char* g_skyflatname;
 
 dboolean hexen = false;
@@ -261,7 +263,7 @@ static void dsda_InitDoom(void) {
   g_menu_cr_hilite = CR_ORANGE;
   g_menu_cr_select = CR_GRAY;
   g_menu_cr_disable = CR_GRAY;
-
+  
   g_skyflatname = "F_SKY1";
 
   // convert doom mobj types to shared type

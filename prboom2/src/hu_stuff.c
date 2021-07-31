@@ -541,6 +541,8 @@ void HU_Start(void)
     VPT_ALIGN_LEFT_BOTTOM
   );
 
+  g_title_font_height = hu_font->height;
+
   // create the hud health widget
   // bargraph and number for amount of health,
   // lower left or upper right of screen

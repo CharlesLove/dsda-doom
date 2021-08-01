@@ -1121,10 +1121,10 @@ void I_UpdateVideoMode(void)
   int actualheight;
   const dboolean novsync = M_CheckParm("-timedemo") || \
                            M_CheckParm("-fastdemo") ||
-                           ((V_GetMode() == VID_MODE8 ||
-                           V_GetMode() == VID_MODE32 ||
-                           V_GetMode() == VID_MODEGL) &&
-                           !exclusive_fullscreen);
+                           // V-sync is disabled in instances where tearing isn't possible
+                           ((V_GetMode() == VID_MODE8 || V_GetMode() == VID_MODE32) &&
+                           !(desired_fullscreen && exclusive_fullscreen)) ||
+                           (V_GetMode() == VID_MODEGL && !desired_fullscreen);
 
   if(sdl_window)
   {

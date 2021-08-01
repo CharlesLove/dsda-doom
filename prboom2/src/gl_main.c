@@ -1269,6 +1269,8 @@ void gld_ProcessExtraAlpha(void)
 {
   if (extra_alpha>0.0f && !invul_method)
   {
+    float current_color[4];
+    glGetFloatv(GL_CURRENT_COLOR, current_color);
     glDisable(GL_ALPHA_TEST);
     glColor4f(extra_red, extra_green, extra_blue, extra_alpha);
     gld_EnableTexture2D(GL_TEXTURE0_ARB, false);
@@ -1280,6 +1282,7 @@ void gld_ProcessExtraAlpha(void)
     glEnd();
     gld_EnableTexture2D(GL_TEXTURE0_ARB, true);
     glEnable(GL_ALPHA_TEST);
+    glColor4f(current_color[0], current_color[1], current_color[2], current_color[3]);
   }
 }
 
@@ -1591,6 +1594,8 @@ static void gld_DrawWall(GLWall *wall)
 
 void gld_AddWall(seg_t *seg)
 {
+  extern sector_t *poly_frontsector;
+  extern dboolean poly_add_line;
   GLWall wall;
   GLTexture *temptex;
   sector_t *frontsector;
@@ -1609,9 +1614,26 @@ void gld_AddWall(seg_t *seg)
   wall.glseg=&gl_lines[seg->linedef->iLineID];
   backseg = seg->sidedef != &sides[seg->linedef->sidenum[0]];
 
-  if (!seg->frontsector)
-    return;
-  frontsector=R_FakeFlat(seg->frontsector, &ftempsec, NULL, NULL, false); // for boom effects
+  if (poly_add_line)
+  {
+    int i = seg->linedef->iLineID;
+    // hexen_note: find some way to do this only on update?
+    gl_lines[i].x1=-(float)lines[i].v1->x/(float)MAP_SCALE;
+    gl_lines[i].z1= (float)lines[i].v1->y/(float)MAP_SCALE;
+    gl_lines[i].x2=-(float)lines[i].v2->x/(float)MAP_SCALE;
+    gl_lines[i].z2= (float)lines[i].v2->y/(float)MAP_SCALE;
+
+    if (!poly_frontsector)
+      return;
+    frontsector=R_FakeFlat(poly_frontsector, &ftempsec, NULL, NULL, false); // for boom effects
+  }
+  else
+  {
+    if (!seg->frontsector)
+      return;
+    frontsector=R_FakeFlat(seg->frontsector, &ftempsec, NULL, NULL, false); // for boom effects
+  }
+
   if (!frontsector)
     return;
 

@@ -27,7 +27,8 @@ dsda_pclass_t pclass[NUMCLASSES] = {
 
     .forwardmove = { 0x19, 0x32 },
     .sidemove = { 0x18, 0x28 },
-    .max_player_move = 0x32,
+    .stroller_threshold = 0x19,
+    .turbo_threshold = 0x32,
   },
 
   [PCLASS_FIGHTER] = {
@@ -37,7 +38,8 @@ dsda_pclass_t pclass[NUMCLASSES] = {
 
     .forwardmove = { 0x1D, 0x3C },
     .sidemove = { 0x1B, 0x3B },
-    .max_player_move = 0x3C,
+    .stroller_threshold = 0x1D,
+    .turbo_threshold = 0x3C,
 
     .normal_state = HEXEN_S_FPLAY,
     .run_state = HEXEN_S_FPLAY_RUN1,
@@ -53,7 +55,8 @@ dsda_pclass_t pclass[NUMCLASSES] = {
 
     .forwardmove = { 0x19, 0x32 },
     .sidemove = { 0x18, 0x28 },
-    .max_player_move = 0x32,
+    .stroller_threshold = 0x19,
+    .turbo_threshold = 0x32,
 
     .normal_state = HEXEN_S_CPLAY,
     .run_state = HEXEN_S_CPLAY_RUN1,
@@ -69,7 +72,8 @@ dsda_pclass_t pclass[NUMCLASSES] = {
 
     .forwardmove = { 0x16, 0x2E },
     .sidemove = { 0x15, 0x25 },
-    .max_player_move = 0x2D,
+    .stroller_threshold = 0x16,
+    .turbo_threshold = 0x2D,
 
     .normal_state = HEXEN_S_MPLAY,
     .run_state = HEXEN_S_MPLAY_RUN1,
@@ -85,7 +89,8 @@ dsda_pclass_t pclass[NUMCLASSES] = {
 
     .forwardmove = { 0x18, 0x31 },
     .sidemove = { 0x17, 0x27 },
-    .max_player_move = 0x31,
+    .stroller_threshold = 0x18,
+    .turbo_threshold = 0x31,
 
     .normal_state = HEXEN_S_PIGPLAY,
     .run_state = HEXEN_S_PIGPLAY_RUN1,

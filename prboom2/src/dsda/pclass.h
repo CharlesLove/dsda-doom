@@ -28,7 +28,8 @@ typedef struct dsda_pclass_s {
 
   fixed_t forwardmove[2];
   fixed_t sidemove[2];
-  fixed_t max_player_move;
+  fixed_t stroller_threshold;
+  fixed_t turbo_threshold;
 
   int normal_state;
   int run_state;

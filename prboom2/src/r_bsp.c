@@ -48,6 +48,8 @@ side_t    *sidedef;
 line_t    *linedef;
 sector_t  *frontsector;
 sector_t  *backsector;
+sector_t  *poly_frontsector;
+dboolean   poly_add_line;
 drawseg_t *ds_p;
 
 // killough 4/7/98: indicates doors closed wrt automap bugfix:
@@ -786,11 +788,13 @@ static void R_Subsector(int num)
     int polyCount;
     seg_t **polySeg;
 
+    poly_add_line = true;
+    poly_frontsector = sub->sector;
     polyCount = sub->poly->numsegs;
     polySeg = sub->poly->segs;
     while (polyCount--)
     {
-      // HEXEN_TODO: find some way to do this only on update?
+      // hexen_note: find some way to do this only on update?
       (*polySeg)->v1->px = (*polySeg)->v1->x;
       (*polySeg)->v1->py = (*polySeg)->v1->y;
       (*polySeg)->v2->px = (*polySeg)->v2->x;
@@ -798,6 +802,8 @@ static void R_Subsector(int num)
       (*polySeg)->pangle = (*polySeg)->angle;
       R_AddLine(*polySeg++);
     }
+    poly_add_line = false;
+    poly_frontsector = NULL;
   }
 
   count = sub->numlines;

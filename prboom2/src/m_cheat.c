@@ -47,6 +47,7 @@
 /* cph 2006/07/23 - needs direct access to thinkercap */
 #include "p_tick.h"
 #include "w_wad.h"
+#include "p_setup.h"
 
 #include "heretic/def.h"
 
@@ -104,6 +105,9 @@ static void cheat_reset_health();
 static void cheat_tome();
 static void cheat_chicken();
 static void cheat_artifact();
+
+// hexen
+static void cheat_init();
 
 //-----------------------------------------------------------------------------
 //
@@ -211,6 +215,9 @@ cheatseq_t cheat[] = {
   CHEAT("engage", NULL, cht_never | not_menu, cheat_clev, -2),
   CHEAT("ravmap", NULL, not_dm, cheat_ddt, 0),
   CHEAT("cockadoodledoo", NULL, cht_never, cheat_chicken, 0),
+
+  // hexen
+  CHEAT("init", NULL, cht_never, cheat_init, 0),
 
   // end-of-list marker
   {NULL}
@@ -412,6 +419,11 @@ static dboolean cannot_clev(int epsd, int map)
     (gamemission == pack_nerve && map > 9)
   ) return true;
 
+  if (hexen)
+  {
+    map = P_TranslateMap(map);
+  }
+
   // Catch invalid maps.
   next = MAPNAME(epsd, map);
   if (W_CheckNumForName(next) == -1)
@@ -433,15 +445,15 @@ static void cheat_clev(char buf[3])
   struct MapEntry* entry;
 
   if (gamemode == commercial)
-    {
-      epsd = 1; //jff was 0, but espd is 1-based
-      map = (buf[0] - '0')*10 + buf[1] - '0';
-    }
+  {
+    epsd = 1; //jff was 0, but espd is 1-based
+    map = (buf[0] - '0') * 10 + buf[1] - '0';
+  }
   else
-    {
-      epsd = buf[0] - '0';
-      map = buf[1] - '0';
-    }
+  {
+    epsd = buf[0] - '0';
+    map = buf[1] - '0';
+  }
 
   // First check if we have a mapinfo entry for the requested level. If this is present the remaining checks should be skipped.
   entry = G_LookupMapinfo(epsd, map);
@@ -1049,4 +1061,17 @@ static void cheat_chicken(void)
     plyr->message = "CHICKEN ON";
   }
   P_MapEnd();
+}
+
+static void cheat_init(void)
+{
+  extern dboolean partial_reset;
+
+  partial_reset = true;
+
+  if (!hexen) return;
+
+  G_DeferedInitNew(gameskill, gameepisode, gamemap);
+
+  P_SetMessage(plyr, "LEVEL WARP", true);
 }

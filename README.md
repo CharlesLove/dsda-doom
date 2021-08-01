@@ -7,7 +7,7 @@ This is my personal fork of dsda-doom with minor alterations to fit my preferenc
 - View bob and weapon sway are now seperate toggles.
 - Option to only display crosshair on target.
 - When extended hud is enabled, the current map name is displayed as well.
-- V-sync is now only enabled for video confogurations where screen tearing is an issue. A cap of 500fps has been put in place globally when v-sync is not active.
+- V-sync is now only enabled for video configurations where screen tearing is an issue. A cap of 500fps has been put in place globally when v-sync is not active.
 
 # From the original dsda-doom project
 ### Patch Notes

@@ -972,41 +972,79 @@ void gld_SetPalette(int palette)
     pal[transparent_pal_index*4+3]=0;
     GLEXT_glColorTableEXT(GL_SHARED_TEXTURE_PALETTE_EXT, GL_RGBA, 256, GL_RGBA, GL_UNSIGNED_BYTE, pal);
   } else {
-    if (palette>0)
+    if (palette > 0)
     {
-      if (palette<=8)
+      if (palette <= 8)
       {
-        extra_red=(float)palette/2.0f;
-        extra_green=0.0f;
-        extra_blue=0.0f;
-        extra_alpha=(float)palette/10.0f;
+        // doom [0] 226 1 1
+        extra_red = 1.0f;
+        extra_green = 0.0f;
+        extra_blue = 0.0f;
+        extra_alpha = (float) palette / 9.0f;
       }
-      else
-        if (palette<=12)
+      else if (palette <= 12)
+      {
+        // doom [0] 108 94 35
+        palette = palette - 8;
+        extra_red = 1.0f;
+        extra_green = 0.9f;
+        extra_blue = 0.3f;
+        extra_alpha = (float) palette / 10.0f;
+      }
+      else if (!hexen && palette == 13)
+      {
+        extra_red = 0.4f;
+        extra_green = 1.0f;
+        extra_blue = 0.0f;
+        extra_alpha = 0.2f;
+      }
+      else if (hexen)
+      {
+        if (palette <= 20)
         {
-          palette=palette-8;
-          extra_red=(float)palette*1.0f;
-          extra_green=(float)palette*0.8f;
-          extra_blue=(float)palette*0.1f;
-          extra_alpha=(float)palette/11.0f;
+          // hexen [0] = 35 74 29
+          palette = palette - 12;
+          extra_red = 0.5f;
+          extra_green = 1.0f;
+          extra_blue = 0.4f;
+          extra_alpha = (float) palette / 27.f;
         }
-        else
-          if (palette==13)
-          {
-            extra_red=0.4f;
-            extra_green=1.0f;
-            extra_blue=0.0f;
-            extra_alpha=0.2f;
-          }
+        else if (palette == 21)
+        {
+          // hexen [0] = 1 1 113
+          extra_red = 0.0f;
+          extra_green = 0.0f;
+          extra_blue = 1.0f;
+          extra_alpha = 0.4f;
+        }
+        else if (palette <= 24)
+        {
+          // hexen [...] = 66, 51, 36
+          palette = 24 - palette;
+          extra_red = 1.0f;
+          extra_green = 1.0f;
+          extra_blue = 1.0f;
+          extra_alpha = 0.14f + 0.06f * palette;
+        }
+        else if (palette <= 27)
+        {
+          // hexen [0] = 76 56 1
+          palette = 27 - palette;
+          extra_red = 1.0f;
+          extra_green = 0.7f;
+          extra_blue = 0.0f;
+          extra_alpha = 0.14f + 0.06f * palette;
+        }
+      }
     }
-    if (extra_red>1.0f)
-      extra_red=1.0f;
-    if (extra_green>1.0f)
-      extra_green=1.0f;
-    if (extra_blue>1.0f)
-      extra_blue=1.0f;
-    if (extra_alpha>1.0f)
-      extra_alpha=1.0f;
+    if (extra_red > 1.0f)
+      extra_red = 1.0f;
+    if (extra_green > 1.0f)
+      extra_green = 1.0f;
+    if (extra_blue > 1.0f)
+      extra_blue = 1.0f;
+    if (extra_alpha > 1.0f)
+      extra_alpha = 1.0f;
   }
 }
 
@@ -2190,6 +2228,68 @@ static void gld_AddFlat(int sectornum, dboolean ceiling, visplane_t *plane)
           case 4:            // Scroll_EastLavaDamage
             flat.flags |= GLFLAT_HAVE_OFFSET;
             flat.uoffs = (float) (((63 - ((leveltime >> 1) & 63)) << 3) & 63) / 64;
+            break;
+        }
+      }
+      else if (hexen)
+      {
+        int scrollOffset = leveltime >> 1 & 63;
+
+        switch (plane->special)
+        {                       // Handle scrolling flats
+          case 201:
+          case 202:
+          case 203:          // Scroll_North_xxx
+            flat.flags |= GLFLAT_HAVE_OFFSET;
+            flat.voffs = (float) (scrollOffset << (plane->special - 201) & 63) / 64;
+            break;
+          case 204:
+          case 205:
+          case 206:          // Scroll_East_xxx
+            flat.flags |= GLFLAT_HAVE_OFFSET;
+            flat.uoffs = (float) ((63 - scrollOffset) << (plane->special - 204) & 63) / 64;
+            break;
+          case 207:
+          case 208:
+          case 209:          // Scroll_South_xxx
+            flat.flags |= GLFLAT_HAVE_OFFSET;
+            flat.voffs = (float) ((63 - scrollOffset) << (plane->special - 207) & 63) / 64;
+            break;
+          case 210:
+          case 211:
+          case 212:          // Scroll_West_xxx
+            flat.flags |= GLFLAT_HAVE_OFFSET;
+            flat.uoffs = (float) (scrollOffset << (plane->special - 210) & 63) / 64;
+            break;
+          case 213:
+          case 214:
+          case 215:          // Scroll_NorthWest_xxx
+            flat.flags |= GLFLAT_HAVE_OFFSET;
+            flat.voffs = (float) (scrollOffset << (plane->special - 213) & 63) / 64;
+            flat.uoffs = (float) (scrollOffset << (plane->special - 213) & 63) / 64;
+            break;
+          case 216:
+          case 217:
+          case 218:          // Scroll_NorthEast_xxx
+            flat.flags |= GLFLAT_HAVE_OFFSET;
+            flat.voffs = (float) (scrollOffset << (plane->special - 216) & 63) / 64;
+            flat.uoffs = (float) ((63 - scrollOffset) << (plane->special - 216) & 63) / 64;
+            break;
+          case 219:
+          case 220:
+          case 221:          // Scroll_SouthEast_xxx
+            flat.flags |= GLFLAT_HAVE_OFFSET;
+            flat.voffs = (float) ((63 - scrollOffset) << (plane->special - 219) & 63) / 64;
+            flat.uoffs = (float) ((63 - scrollOffset) << (plane->special - 219) & 63) / 64;
+            break;
+          case 222:
+          case 223:
+          case 224:          // Scroll_SouthWest_xxx
+            flat.flags |= GLFLAT_HAVE_OFFSET;
+            flat.voffs = (float) ((63 - scrollOffset) << (plane->special - 222) & 63) / 64;
+            flat.uoffs = (float) (scrollOffset << (plane->special - 222) & 63) / 64;
+            break;
+          default:
             break;
         }
       }

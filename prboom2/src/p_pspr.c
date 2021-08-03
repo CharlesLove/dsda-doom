@@ -2557,6 +2557,8 @@ void P_CloseWeapons(void)
 
 // hexen
 
+#include "heretic/sb_bar.h"
+
 extern fixed_t FloatBobOffsets[64];
 
 static int WeaponManaUse[NUMCLASSES][HEXEN_NUMWEAPONS] = {
@@ -3044,8 +3046,6 @@ void MStaffSpawn(mobj_t * pmo, angle_t angle)
     }
 }
 
-// HEXEN_TODO: I_SetPalette stuff
-
 void A_MStaffAttack(player_t * player, pspdef_t * psp)
 {
     angle_t angle;
@@ -3064,9 +3064,8 @@ void A_MStaffAttack(player_t * player, pspdef_t * psp)
     {
         player->damagecount = 0;
         player->bonuscount = 0;
-        // I_SetPalette((byte *) W_CacheLumpNum(W_GetNumForName("playpal"),
-        //                                      PU_CACHE) +
-        //              STARTSCOURGEPAL * 768);
+        V_SetPalette(STARTSCOURGEPAL);
+        SB_Start();
     }
 }
 
@@ -3076,13 +3075,13 @@ void A_MStaffPalette(player_t * player, pspdef_t * psp)
 
     if (player == &players[consoleplayer])
     {
-        // pal = STARTSCOURGEPAL + psp->state - (&states[HEXEN_S_MSTAFFATK_2]);
-        // if (pal == STARTSCOURGEPAL + 3)
-        // {                       // reset back to original playpal
-        //     pal = 0;
-        // }
-        // I_SetPalette((byte *) W_CacheLumpNum(W_GetNumForName("playpal"),
-        //                                      PU_CACHE) + pal * 768);
+        pal = STARTSCOURGEPAL + psp->state - (&states[HEXEN_S_MSTAFFATK_2]);
+        if (pal == STARTSCOURGEPAL + 3)
+        {                       // reset back to original playpal
+            pal = 0;
+        }
+        V_SetPalette(pal);
+        SB_Start();
     }
 }
 
@@ -3596,8 +3595,8 @@ void A_CHolyAttack(player_t * player, pspdef_t * psp)
     {
         player->damagecount = 0;
         player->bonuscount = 0;
-        // I_SetPalette((byte *) W_CacheLumpNum(W_GetNumForName("playpal"),
-        //                                      PU_CACHE) + STARTHOLYPAL * 768);
+        V_SetPalette(STARTHOLYPAL);
+        SB_Start();
     }
     S_StartSound(player->mo, hexen_sfx_choly_fire);
 }
@@ -3608,13 +3607,13 @@ void A_CHolyPalette(player_t * player, pspdef_t * psp)
 
     if (player == &players[consoleplayer])
     {
-        // pal = STARTHOLYPAL + psp->state - (&states[HEXEN_S_CHOLYATK_6]);
-        // if (pal == STARTHOLYPAL + 3)
-        // {                       // reset back to original playpal
-        //     pal = 0;
-        // }
-        // I_SetPalette((byte *) W_CacheLumpNum(W_GetNumForName("playpal"),
-        //                                      PU_CACHE) + pal * 768);
+        pal = STARTHOLYPAL + psp->state - (&states[HEXEN_S_CHOLYATK_6]);
+        if (pal == STARTHOLYPAL + 3)
+        {                       // reset back to original playpal
+            pal = 0;
+        }
+        V_SetPalette(pal);
+        SB_Start();
     }
 }
 

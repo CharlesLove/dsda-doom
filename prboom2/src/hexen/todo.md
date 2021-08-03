@@ -1,0 +1,16 @@
+### Hexen Support
+- ghosts
+- analysis
+- key frames
+- dehacked
+- morph for exhud
+- sky code
+- test save files
+- render_doom_lightmaps
+- MStaff palette
+- ALTSHADOW
+- polyseg vertex optimization
+- palette fade code
+- yellow message variant
+- opengl floorclip
+- opengl hexen scrollers

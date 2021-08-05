@@ -217,7 +217,21 @@ cheatseq_t cheat[] = {
   CHEAT("cockadoodledoo", NULL, cht_never, cheat_chicken, 0),
 
   // hexen
+  CHEAT("satan", NULL, cht_never, cheat_god, 0),
+  CHEAT("clubmed", NULL, cht_never, cheat_reset_health, 0),
+  CHEAT("butcher", NULL, cht_never, cheat_massacre, 0),
+  CHEAT("nra", NULL, cht_never, cheat_fa, 0),
+  // CHEAT("indiana", NULL, cht_never, cheat_inventory, 0),
+  CHEAT("locksmith", NULL, cht_never, cheat_k, 0),
+  // CHEAT("sherlock", NULL, cht_never, cheat_puzzle, 0),
+  CHEAT("casper", NULL, cht_never, cheat_noclip, 0),
+  // CHEAT("shadowcaster", NULL, cht_never, cheat_class, -2),
+  CHEAT("visit", NULL, cht_never | not_menu, cheat_clev, -2),
   CHEAT("init", NULL, cht_never, cheat_init, 0),
+  // CHEAT("puke", NULL, cht_never, cheat_script, -2),
+  CHEAT("mapsco", NULL, not_dm, cheat_ddt, 0),
+  CHEAT("deliverance", NULL, cht_never, cheat_chicken, 0),
+  // CHEAT("conan", NULL, cht_never, cheat_conan, 0),
 
   // end-of-list marker
   {NULL}
@@ -333,27 +347,45 @@ static void cheat_fa()
 {
   int i;
 
-  if (!plyr->backpack)
+  if (hexen)
+  {
+    for (i = 0; i < NUMARMOR; i++)
+    {
+        plyr->armorpoints[i] = pclass[plyr->pclass].armor_increment[i];
+    }
+    for (i = 0; i < HEXEN_NUMWEAPONS; i++)
+    {
+        plyr->weaponowned[i] = true;
+    }
+    for (i = 0; i < NUMMANA; i++)
+    {
+        plyr->ammo[i] = MAX_MANA;
+    }
+  }
+  else
+  {
+    if (!plyr->backpack)
     {
       for (i=0 ; i<NUMAMMO ; i++)
         plyr->maxammo[i] *= 2;
       plyr->backpack = true;
     }
 
-  plyr->armorpoints[ARMOR_ARMOR] = idfa_armor;      // Ty 03/09/98 - deh
-  plyr->armortype = idfa_armor_class;  // Ty 03/09/98 - deh
+    plyr->armorpoints[ARMOR_ARMOR] = idfa_armor;      // Ty 03/09/98 - deh
+    plyr->armortype = idfa_armor_class;  // Ty 03/09/98 - deh
 
-  // You can't own weapons that aren't in the game // phares 02/27/98
-  for (i=0;i<NUMWEAPONS;i++)
-    if (!(((i == wp_plasma || i == wp_bfg) && gamemode == shareware) ||
-          (i == wp_supershotgun && gamemode != commercial)))
-      plyr->weaponowned[i] = true;
+    // You can't own weapons that aren't in the game // phares 02/27/98
+    for (i=0;i<NUMWEAPONS;i++)
+      if (!(((i == wp_plasma || i == wp_bfg) && gamemode == shareware) ||
+            (i == wp_supershotgun && gamemode != commercial)))
+        plyr->weaponowned[i] = true;
 
-  for (i=0;i<NUMAMMO;i++)
-    if (i!=am_cell || gamemode!=shareware)
-      plyr->ammo[i] = plyr->maxammo[i];
+    for (i=0;i<NUMAMMO;i++)
+      if (i!=am_cell || gamemode!=shareware)
+        plyr->ammo[i] = plyr->maxammo[i];
 
-  plyr->message = s_STSTR_FAADDED;
+    plyr->message = s_STSTR_FAADDED;
+  }
 }
 
 static void cheat_k()
@@ -1046,19 +1078,34 @@ static void cheat_tome(void)
 
 static void cheat_chicken(void)
 {
-  if (!heretic) return;
+  if (!raven) return;
 
   P_MapStart();
-  if (plyr->chickenTics)
+  if (heretic)
   {
-    if (P_UndoPlayerChicken(plyr))
+    if (plyr->chickenTics)
     {
-        plyr->message = "CHICKEN OFF";
+      if (P_UndoPlayerChicken(plyr))
+      {
+          plyr->message = "CHICKEN OFF";
+      }
+    }
+    else if (P_ChickenMorphPlayer(plyr))
+    {
+      plyr->message = "CHICKEN ON";
     }
   }
-  else if (P_ChickenMorphPlayer(plyr))
+  else
   {
-    plyr->message = "CHICKEN ON";
+    if (plyr->morphTics)
+    {
+      P_UndoPlayerMorph(plyr);
+    }
+    else
+    {
+      P_MorphPlayer(plyr);
+    }
+    plyr->message = "SQUEAL!!";
   }
   P_MapEnd();
 }
@@ -1067,11 +1114,11 @@ static void cheat_init(void)
 {
   extern dboolean partial_reset;
 
-  partial_reset = true;
-
   if (!hexen) return;
 
-  G_DeferedInitNew(gameskill, gameepisode, gamemap);
+  partial_reset = true;
+
+  G_DeferedInitNew(gameskill, gameepisode, P_GetMapWarpTrans(gamemap));
 
   P_SetMessage(plyr, "LEVEL WARP", true);
 }

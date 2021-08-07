@@ -790,7 +790,7 @@ void HU_Start(void)
     &message_list
   );
 
-  if (gamemapinfo != NULL)
+  if (gamemapinfo && gamemapinfo->levelname)
   {
 	  if (gamemapinfo->label)
 		  s = gamemapinfo->label;
@@ -805,7 +805,6 @@ void HU_Start(void)
 		  HUlib_addCharToTextLine(&w_title, ' ');
 	  }
 	  s = gamemapinfo->levelname;
-	  if (!s) s = "Unnamed";
   }
   else
   {

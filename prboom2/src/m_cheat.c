@@ -48,6 +48,7 @@
 #include "p_tick.h"
 #include "w_wad.h"
 #include "p_setup.h"
+#include "lprintf.h"
 
 #include "heretic/def.h"
 
@@ -107,7 +108,11 @@ static void cheat_chicken();
 static void cheat_artifact();
 
 // hexen
+static void cheat_inventory();
+static void cheat_puzzle();
+static void cheat_class();
 static void cheat_init();
+static void cheat_script();
 
 //-----------------------------------------------------------------------------
 //
@@ -221,17 +226,16 @@ cheatseq_t cheat[] = {
   CHEAT("clubmed", NULL, cht_never, cheat_reset_health, 0),
   CHEAT("butcher", NULL, cht_never, cheat_massacre, 0),
   CHEAT("nra", NULL, cht_never, cheat_fa, 0),
-  // CHEAT("indiana", NULL, cht_never, cheat_inventory, 0),
+  CHEAT("indiana", NULL, cht_never, cheat_inventory, 0),
   CHEAT("locksmith", NULL, cht_never, cheat_k, 0),
-  // CHEAT("sherlock", NULL, cht_never, cheat_puzzle, 0),
+  CHEAT("sherlock", NULL, cht_never, cheat_puzzle, 0),
   CHEAT("casper", NULL, cht_never, cheat_noclip, 0),
-  // CHEAT("shadowcaster", NULL, cht_never, cheat_class, -2),
+  CHEAT("shadowcaster", NULL, cht_never, cheat_class, -1),
   CHEAT("visit", NULL, cht_never | not_menu, cheat_clev, -2),
   CHEAT("init", NULL, cht_never, cheat_init, 0),
-  // CHEAT("puke", NULL, cht_never, cheat_script, -2),
+  CHEAT("puke", NULL, cht_never, cheat_script, -2),
   CHEAT("mapsco", NULL, not_dm, cheat_ddt, 0),
   CHEAT("deliverance", NULL, cht_never, cheat_chicken, 0),
-  // CHEAT("conan", NULL, cht_never, cheat_conan, 0),
 
   // end-of-list marker
   {NULL}
@@ -1008,6 +1012,10 @@ static void cheat_reset_health(void)
   {
     plyr->health = plyr->mo->health = MAXCHICKENHEALTH;
   }
+  else if (hexen && plyr->morphTics)
+  {
+    plyr->health = plyr->mo->health = MAXMORPHHEALTH;
+  }
   else
   {
     plyr->health = plyr->mo->health = MAXHEALTH;
@@ -1110,6 +1118,10 @@ static void cheat_chicken(void)
   P_MapEnd();
 }
 
+// hexen
+
+#include "hexen/p_acs.h"
+
 static void cheat_init(void)
 {
   extern dboolean partial_reset;
@@ -1121,4 +1133,101 @@ static void cheat_init(void)
   G_DeferedInitNew(gameskill, gameepisode, P_GetMapWarpTrans(gamemap));
 
   P_SetMessage(plyr, "LEVEL WARP", true);
+}
+
+static void cheat_inventory(void)
+{
+  int i, j;
+  int start, end;
+
+  if (!raven) return;
+
+  if (heretic)
+  {
+    start = arti_none + 1;
+    end = NUMARTIFACTS;
+  }
+  else
+  {
+    start = hexen_arti_none + 1;
+    end = hexen_arti_firstpuzzitem;
+  }
+
+  for (i = start; i < end; i++)
+  {
+    for (j = 0; j < g_arti_limit; j++)
+    {
+      P_GiveArtifact(plyr, i, NULL);
+    }
+  }
+  P_SetMessage(plyr, "ALL ARTIFACTS", true);
+}
+
+static void cheat_puzzle(void)
+{
+  int i, j;
+
+  if (!hexen) return;
+
+  for (i = hexen_arti_firstpuzzitem; i < HEXEN_NUMARTIFACTS; i++)
+  {
+    P_GiveArtifact(plyr, i, NULL);
+  }
+  P_SetMessage(plyr, "ALL PUZZLE ITEMS", true);
+}
+
+static void cheat_class(char buf[2])
+{
+  int i;
+  int new_class;
+
+  if (!hexen) return;
+
+  if (plyr->morphTics)
+  {                           // don't change class if the player is morphed
+      return;
+  }
+
+  new_class = 1 + (buf[0] - '0');
+  if (new_class > PCLASS_MAGE || new_class < PCLASS_FIGHTER)
+  {
+    P_SetMessage(plyr, "INVALID PLAYER CLASS", true);
+    return;
+  }
+  plyr->pclass = new_class;
+  for (i = 0; i < NUMARMOR; i++)
+  {
+    plyr->armorpoints[i] = 0;
+  }
+  PlayerClass[consoleplayer] = new_class;
+  P_PostMorphWeapon(plyr, wp_first);
+  SB_SetClassData();
+  SB_Start();
+  P_SetMessage(plyr, "CLASS CHANGED", true);
+}
+
+static void cheat_script(char buf[3])
+{
+  int script;
+  byte script_args[3];
+  int tens, ones;
+  static char textBuffer[40];
+
+  if (!hexen) return;
+
+  tens = buf[0] - '0';
+  ones = buf[1] - '0';
+  script = tens * 10 + ones;
+  if (script < 1)
+      return;
+  if (script > 99)
+      return;
+  script_args[0] = script_args[1] = script_args[2] = 0;
+
+  if (P_StartACS(script, 0, script_args, plyr->mo, NULL, 0))
+  {
+    doom_snprintf(textBuffer, sizeof(textBuffer),
+                  "RUNNING SCRIPT %.2d", script);
+    P_SetMessage(plyr, textBuffer, true);
+  }
 }

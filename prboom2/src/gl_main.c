@@ -152,6 +152,9 @@ GLfloat cm2RGB[CR_LIMIT + 1][4] =
   {1.00f ,0.50f, 0.25f, 1.00f}, //CR_ORANGE
   {1.00f ,1.00f, 0.00f, 1.00f}, //CR_YELLOW
   {0.50f ,0.50f, 1.00f, 1.00f}, //CR_BLUE2
+  {0.00f ,0.00f, 0.00f, 1.00f}, //CR_BLACK
+  {0.50f ,0.00f, 0.50f, 1.00f}, //CR_PURPLE
+  {1.00f ,1.00f, 1.00f, 1.00f}, //CR_WHITE
   {1.00f ,1.00f, 1.00f, 1.00f}, //CR_LIMIT
 };
 
@@ -2744,7 +2747,10 @@ void gld_ProjectSprite(mobj_t* thing, int lightlevel)
     sprite.light = gld_CalcLightLevel(lightlevel+(extralight<<5));
     sprite.fogdensity = gld_CalcFogDensity(thing->subsector->sector, lightlevel, GLDIT_SPRITE);
   }
-  sprite.cm = CR_LIMIT + (int)((thing->flags & MF_TRANSLATION) >> (MF_TRANSSHIFT));
+  if (thing->color)
+    sprite.cm = thing->color;
+  else
+    sprite.cm = CR_LIMIT + (int)((thing->flags & MF_TRANSLATION) >> (MF_TRANSSHIFT));
   sprite.gltexture = gld_RegisterPatch(lump, sprite.cm, true);
   if (!sprite.gltexture)
     goto unlock_patch;

@@ -304,6 +304,9 @@ static void dsda_InitDoom(void) {
     mobjinfo[i].ripsound = sfx_None;
     mobjinfo[i].altspeed = NO_ALTSPEED;
     mobjinfo[i].meleerange = MELEERANGE;
+
+    // misc
+    mobjinfo[i].bloodcolor = 0; // default
   }
 
   // don't want to reorganize info.c structure for a few tweaks...
@@ -482,6 +485,9 @@ static void dsda_InitHeretic(void) {
     mobjinfo[j].ripsound = heretic_sfx_None;
     mobjinfo[j].altspeed = NO_ALTSPEED;
     mobjinfo[j].meleerange = MELEERANGE;
+
+    // misc
+    mobjinfo[j].bloodcolor = 0; // default
   }
 
   // heretic doesn't use "clip" concept
@@ -636,6 +642,9 @@ static void dsda_InitHexen(void) {
     mobjinfo[j].ripsound = hexen_sfx_None;
     mobjinfo[j].altspeed = NO_ALTSPEED;
     mobjinfo[j].meleerange = MELEERANGE;
+
+    // misc
+    mobjinfo[j].bloodcolor = 0; // default
   }
 
   {

@@ -35,11 +35,11 @@ void dsda_InitExHud(patchnum_t* font) {
   
   if(heretic)
   {
-    exhud_max_total_y_pos -= 2;
+    exhud_max_total_y_pos -= 3;
   }
   else if(raven)
   {
-    exhud_max_total_y_pos -= 6;
+    exhud_max_total_y_pos -= 7;
   }
 
   HUlib_initTextLine(

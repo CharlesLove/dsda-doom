@@ -1115,11 +1115,9 @@ void I_UpdateVideoMode(void)
   const dboolean novsync = M_CheckParm("-timedemo") || \
                            M_CheckParm("-fastdemo") ||
                            // V-sync is disabled in instances where tearing isn't possible
-                           (!V_IsOpenGLMode() &&
-                           !(desired_fullscreen && exclusive_fullscreen)); //||
-                           // (V_IsOpenGLMode() && !desired_fullscreen);
-                           // commented out due to opengl no longer being
-                           // tear free at native res windowed
+                           (V_IsSoftwareMode() &&
+                           !(desired_fullscreen && exclusive_fullscreen)) ||
+                           (V_IsOpenGLMode() && !desired_fullscreen);
 
   if(sdl_window)
   {

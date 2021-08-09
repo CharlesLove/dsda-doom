@@ -3190,7 +3190,7 @@ setup_menu_t* gen_settings[] =
 #define G_X2 284
 
 static const char *videomodes[] = {
-  "8bit", "32bit",
+  "Software",
 #ifdef GL_DOOM
   "OpenGL",
 #endif
@@ -3207,18 +3207,17 @@ setup_menu_t gen_settings1[] = { // General Settings screen1
   {"Aspect Ratio",                   S_CHOICE,           m_null, G_X, G_Y+ 4*8, {"render_aspect"}, 0, M_ChangeAspectRatio, render_aspects_list},
   {"Fullscreen Video mode",          S_YESNO,            m_null, G_X, G_Y+ 5*8, {"use_fullscreen"}, 0, M_ChangeFullScreen},
   {"Software Exclusive Fullscreen",  S_YESNO,            m_null, G_X, G_Y+ 6*8, {"exclusive_fullscreen"}, 0, M_ChangeVideoMode},
-  {"Screen Tear Only Vertical Sync", S_YESNO,            m_null, G_X, G_Y+ 7*8, {"render_vsync"}, 0, M_ChangeVideoMode},
-  {"Status Bar and Menu Appearance", S_CHOICE,           m_null, G_X, G_Y+ 8*8, {"render_stretch_hud"}, 0, M_ChangeStretch, render_stretch_list},
-  {"Enable Translucency",            S_YESNO,            m_null, G_X, G_Y+ 9*8, {"translucency"}, 0, M_Trans},
-  {"Translucency filter percentage", S_NUM,              m_null, G_X, G_Y+10*8, {"tran_filter_pct"}, 0, M_Trans},
-  {"Extended Framerate",             S_YESNO,            m_null, G_X, G_Y+11*8, {"uncapped_framerate"}, 0, M_ChangeUncappedFrameRate},
+  {"Status Bar and Menu Appearance", S_CHOICE,           m_null, G_X, G_Y+ 7*8, {"render_stretch_hud"}, 0, M_ChangeStretch, render_stretch_list},
+  {"Vertical Sync",                  S_YESNO,            m_null, G_X, G_Y+ 8*8, {"render_vsync"}, 0, M_ChangeVideoMode},
+  {"Translucency filter percentage", S_NUM,              m_null, G_X, G_Y+ 9*8, {"tran_filter_pct"}, 0, M_Trans},
+  {"Uncapped Framerate",             S_YESNO,            m_null, G_X, G_Y+10*8, {"uncapped_framerate"}, 0, M_ChangeUncappedFrameRate},
 
-  {"Sound & Music",                  S_SKIP|S_TITLE,     m_null, G_X, G_Y+13*8},
-  {"Number of Sound Channels",       S_NUM|S_PRGWARN,    m_null, G_X, G_Y+14*8, {"snd_channels"}},
-  {"Enable v1.1 Pitch Effects",      S_YESNO,            m_null, G_X, G_Y+15*8, {"pitched_sounds"}},
-  {"PC Speaker emulation",           S_YESNO|S_PRGWARN,  m_null, G_X, G_Y+16*8, {"snd_pcspeaker"}},
-  {"Preferred MIDI player",          S_CHOICE|S_PRGWARN, m_null, G_X, G_Y+17*8, {"snd_midiplayer"}, 0, M_ChangeMIDIPlayer, midiplayers},
-  {"Disable Sound Cutoffs",          S_YESNO,            m_null, G_X, G_Y+18*8, {"full_sounds"}},
+  {"Sound & Music",                  S_SKIP|S_TITLE,     m_null, G_X, G_Y+12*8},
+  {"Number of Sound Channels",       S_NUM|S_PRGWARN,    m_null, G_X, G_Y+13*8, {"snd_channels"}},
+  {"Enable v1.1 Pitch Effects",      S_YESNO,            m_null, G_X, G_Y+14*8, {"pitched_sounds"}},
+  {"PC Speaker emulation",           S_YESNO|S_PRGWARN,  m_null, G_X, G_Y+15*8, {"snd_pcspeaker"}},
+  {"Preferred MIDI player",          S_CHOICE|S_PRGWARN, m_null, G_X, G_Y+16*8, {"snd_midiplayer"}, 0, M_ChangeMIDIPlayer, midiplayers},
+  {"Disable Sound Cutoffs",          S_YESNO,            m_null, G_X, G_Y+17*8, {"full_sounds"}},
 
   // Button for resetting to defaults
   {0,S_RESET,m_null,X_BUTTON,Y_BUTTON},
@@ -3459,10 +3458,7 @@ setup_menu_t dsda_gen_settings[] = {
 
 void M_Trans(void) // To reset translucency after setting it in menu
 {
-  general_translucency = default_translucency; //e6y: Fix for "translucency won't change until you restart the engine"
-
-  if (general_translucency)
-    R_InitTranMap(0);
+  R_InitTranMap(0);
 }
 
 // To (un)set fullscreen video after menu changes
@@ -3489,7 +3485,7 @@ void M_ChangeDemoSmoothTurns(void)
 void M_ChangeTextureParams(void)
 {
 #ifdef GL_DOOM
-  if (V_GetMode() == VID_MODEGL)
+  if (V_IsOpenGLMode())
   {
     gld_InitTextureParams();
     gld_FlushTextures();
@@ -4677,7 +4673,7 @@ dboolean M_Responder (event_t* ev) {
     {
 //e6y
 #ifdef GL_DOOM
-      if (V_GetMode() == VID_MODEGL && gl_hardware_gamma)
+      if (V_IsOpenGLMode() && gl_hardware_gamma)
       {
         static char str[200];
         useglgamma++;
@@ -4852,7 +4848,7 @@ dboolean M_Responder (event_t* ev) {
     }
 
 #ifdef GL_DOOM
-    if (V_GetMode() == VID_MODEGL)
+    if (V_IsOpenGLMode())
     {
       if (dsda_InputActivated(dsda_input_showalive) && !dsda_StrictMode())
       {

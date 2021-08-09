@@ -310,7 +310,7 @@ void D_Display (fixed_t frac)
       return;
 
 #ifdef GL_DOOM
-    if (V_GetMode() == VID_MODEGL)
+    if (V_IsOpenGLMode())
     {
       gld_PreprocessLevel();
     }
@@ -385,7 +385,7 @@ void D_Display (fixed_t frac)
       borderwillneedredraw = (borderwillneedredraw) ||
         (((automapmode & am_active) && !(automapmode & am_overlay)));
     }
-    if (redrawborderstuff || (V_GetMode() == VID_MODEGL))
+    if (redrawborderstuff || (V_IsOpenGLMode()))
       R_DrawViewBorder();
 
     // e6y
@@ -424,11 +424,11 @@ void D_Display (fixed_t frac)
         (menuactive == mnact_full));
 
     BorderNeedRefresh = false;
-    if (V_GetMode() != VID_MODEGL)
+    if (V_IsSoftwareMode())
       R_DrawViewBorder();
     HU_Drawer();
 
-    if (V_GetMode() == VID_MODEGL)
+    if (V_IsOpenGLMode())
       gld_ProcessExtraAlpha();
   }
 
@@ -2003,9 +2003,6 @@ static void D_DoomMainSetup(void)
     }
     free(file);
   }
-
-  // internal translucency set to config file value               // phares
-  general_translucency = default_translucency;                    // phares
 
   //e6y
   {

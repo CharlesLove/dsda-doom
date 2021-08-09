@@ -581,7 +581,7 @@ static void R_DrawVisSprite(vissprite_t *vis)
     dcvars.translation = translationtables - 256 +
       ((vis->mobjflags & MF_TRANSLATION) >> (MF_TRANSSHIFT-8) );
   }
-  else if (vis->mobjflags & g_mf_translucent && general_translucency) // phares
+  else if (vis->mobjflags & g_mf_translucent) // phares
   {
     colfunc = R_GetDrawColumnFunc(RDC_PIPELINE_TRANSLUCENT, filter, filterz);
     tranmap = main_tranmap;       // killough 4/11/98
@@ -638,7 +638,7 @@ void R_SetClipPlanes(void)
 {
   // thing is behind view plane?
 #ifdef GL_DOOM
-  if ((V_GetMode() == VID_MODEGL) &&
+  if ((V_IsOpenGLMode()) &&
       (HaveMouseLook() || (render_fov > FOV90)) &&
       (!render_paperitems || simple_shadows.loaded))
   {
@@ -682,7 +682,7 @@ static void R_ProjectSprite (mobj_t* thing, int lightlevel)
   int width;
 
 #ifdef GL_DOOM
-  if (V_GetMode() == VID_MODEGL)
+  if (V_IsOpenGLMode())
   {
     gld_ProjectSprite(thing, lightlevel);
     return;
@@ -1219,7 +1219,7 @@ static void R_DrawPSprite (pspdef_t *psp)
   }
 
   // proff 11/99: don't use software stuff in OpenGL
-  if (V_GetMode() != VID_MODEGL)
+  if (V_IsSoftwareMode())
   {
     R_DrawVisSprite(vis);
   }

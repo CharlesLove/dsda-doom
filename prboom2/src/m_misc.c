@@ -391,7 +391,7 @@ default_t defaults[] =
   {"mus_opl_gain",{&mus_opl_gain},{50},0,1000,def_int,ss_none}, // NSM  fine tune opl output level
 
   {"Video settings",{NULL},{0},UL,UL,def_none,ss_none},
-  {"videomode",{NULL, &default_videomode},{0,"8bit"},UL,UL,def_str,ss_none},
+  {"videomode",{NULL, &default_videomode},{0,"Software"},UL,UL,def_str,ss_none},
   /* 640x480 default resolution */
   {"screen_resolution",{NULL, &screen_resolution},{0,"640x480"},UL,UL,def_str,ss_none},
   {"use_fullscreen",{&use_fullscreen},{0},0,1, /* proff 21/05/2000 */
@@ -400,8 +400,6 @@ default_t defaults[] =
   def_bool,ss_none},
   {"render_vsync",{&render_vsync},{1},0,1,
    def_bool,ss_none},
-  {"translucency",{&default_translucency},{1},0,1,   // phares
-   def_bool,ss_none}, // enables translucency
   {"tran_filter_pct",{&tran_filter_pct},{66},0,100,         // killough 2/21/98
    def_int,ss_none}, // set percentage of foreground/background translucency mix
   {"screenblocks",{&screenblocks},{10},3,11,  // killough 2/21/98: default to 10

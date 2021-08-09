@@ -3208,9 +3208,9 @@ setup_menu_t gen_settings1[] = { // General Settings screen1
   {"Fullscreen Video mode",          S_YESNO,            m_null, G_X, G_Y+ 5*8, {"use_fullscreen"}, 0, M_ChangeFullScreen},
   {"Software Exclusive Fullscreen",  S_YESNO,            m_null, G_X, G_Y+ 6*8, {"exclusive_fullscreen"}, 0, M_ChangeVideoMode},
   {"Status Bar and Menu Appearance", S_CHOICE,           m_null, G_X, G_Y+ 7*8, {"render_stretch_hud"}, 0, M_ChangeStretch, render_stretch_list},
-  {"Vertical Sync",                  S_YESNO,            m_null, G_X, G_Y+ 8*8, {"render_vsync"}, 0, M_ChangeVideoMode},
+  {"Smart Vertical Sync",            S_YESNO,            m_null, G_X, G_Y+ 8*8, {"render_vsync"}, 0, M_ChangeVideoMode},
   {"Translucency filter percentage", S_NUM,              m_null, G_X, G_Y+ 9*8, {"tran_filter_pct"}, 0, M_Trans},
-  {"Uncapped Framerate",             S_YESNO,            m_null, G_X, G_Y+10*8, {"uncapped_framerate"}, 0, M_ChangeUncappedFrameRate},
+  {"Extended Framerate",             S_YESNO,            m_null, G_X, G_Y+10*8, {"uncapped_framerate"}, 0, M_ChangeUncappedFrameRate},
 
   {"Sound & Music",                  S_SKIP|S_TITLE,     m_null, G_X, G_Y+12*8},
   {"Number of Sound Channels",       S_NUM|S_PRGWARN,    m_null, G_X, G_Y+13*8, {"snd_channels"}},

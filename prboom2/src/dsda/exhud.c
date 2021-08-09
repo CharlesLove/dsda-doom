@@ -31,10 +31,21 @@ dsda_text_t dsda_exhud_timer;
 dsda_text_t dsda_exhud_max_totals;
 
 void dsda_InitExHud(patchnum_t* font) {
+  int exhud_max_total_y_pos = 200 - g_st_height - 9 - g_title_font_height;
+  
+  if(heretic)
+  {
+    exhud_max_total_y_pos -= 2;
+  }
+  else if(raven)
+  {
+    exhud_max_total_y_pos -= 6;
+  }
+
   HUlib_initTextLine(
     &dsda_exhud_timer.text,
     DSDA_EXHUD_X,
-    200 - g_st_height - 17 - g_title_font_height,
+    exhud_max_total_y_pos - 8,
     font,
     HU_FONTSTART,
     g_cr_gray,
@@ -44,7 +55,7 @@ void dsda_InitExHud(patchnum_t* font) {
   HUlib_initTextLine(
     &dsda_exhud_max_totals.text,
     DSDA_EXHUD_X,
-    200 - g_st_height - 9 - g_title_font_height,
+    exhud_max_total_y_pos,
     font,
     HU_FONTSTART,
     g_cr_gray,

@@ -80,6 +80,7 @@
 #include "am_map.h"
 #include "hu_tracers.h"
 #include "dsda.h"
+#include "dsda/settings.h"
 #ifdef GL_DOOM
 #include "gl_struct.h"
 #include "gl_intern.h"
@@ -126,8 +127,6 @@ int hudadd_crosshair_show_target;
 int movement_strafe50;
 int movement_shorttics;
 int movement_strafe50onturns;
-int movement_mouselook;
-int movement_mousenovert;
 int movement_mouseinvert;
 int movement_maxviewpitch;
 int movement_mousestrafedivisor;
@@ -500,7 +499,7 @@ void M_ChangeMouseLook(void)
 
 #ifdef GL_DOOM
   if (gl_skymode == skytype_auto)
-    gl_drawskys = (movement_mouselook ? skytype_skydome : skytype_standard);
+    gl_drawskys = (dsda_MouseLook() ? skytype_skydome : skytype_standard);
   else
     gl_drawskys = gl_skymode;
 #endif // GL_DOOM
@@ -539,10 +538,6 @@ void M_ChangeScreenMultipleFactor(void)
   V_ChangeScreenResolution();
 }
 
-dboolean GetMouseLook(void)
-{
-  return movement_mouselook;
-}
 dboolean HaveMouseLook(void)
 {
   return (viewpitch != 0);

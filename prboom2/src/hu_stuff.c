@@ -2820,6 +2820,8 @@ char HU_dequeueChatChar(void)
 //
 // Passed the event to respond to, returns true if the event was handled
 //
+#define CHAT_ENTER -1
+
 dboolean HU_Responder(event_t *ev)
 {
 
@@ -2828,7 +2830,7 @@ dboolean HU_Responder(event_t *ev)
   dboolean   eatkey = false;
   static dboolean  shiftdown = false;
   static dboolean  altdown = false;
-  unsigned char   c;
+  int     c;
   int     i;
   int     numplayers;
 
@@ -2862,14 +2864,10 @@ dboolean HU_Responder(event_t *ev)
     bsdown = false;
     bscounter = 0;
   }
-  else if (dsda_InputActivated(dsda_input_chat_enter))
-  {
-    c = KEYD_ENTER;
-  }
 
   if (!chat_on)
   {
-    if (c == KEYD_ENTER) // phares
+    if (dsda_InputActivated(dsda_input_chat_enter)) // phares
     {
       if (hud_msg_lines>1)  // it posts multi-line messages that will trash
       {
@@ -2927,6 +2925,11 @@ dboolean HU_Responder(event_t *ev)
   }//jff 2/26/98 no chat functions if message review is displayed
   else if (!message_list && c)
   {
+    if (dsda_InputActivated(dsda_input_chat_enter))
+    {
+      c = CHAT_ENTER;
+    }
+
     // send a macro
     if (altdown)
     {
@@ -2957,7 +2960,7 @@ dboolean HU_Responder(event_t *ev)
       if (eatkey)
         HU_queueChatChar(c);
 
-      if (c == KEYD_ENTER) // phares
+      if (c == CHAT_ENTER) // phares
       {
         chat_on = false;
         if (w_chat.l.len)

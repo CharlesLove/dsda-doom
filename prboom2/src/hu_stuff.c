@@ -2254,7 +2254,7 @@ void SetCrosshairTarget(void)
   crosshair.target_screen_x = 0.0f;
   crosshair.target_screen_y = 0.0f;
 
-  if (dsda_CrosshairLockTarget() && crosshair.target_sprite >= 0)
+  if (dsda_CrosshairLockTarget() && crosshair.target_sprite >= 0 && !(linetarget->flags & MF_SHADOW))
   {
     float x, y, z;
     float winx, winy, winz;
@@ -2332,7 +2332,7 @@ void HU_draw_crosshair(void)
     }
     overflows_enabled = true;
 
-    if (linetarget && !(linetarget->flags & MF_SHADOW))
+    if (linetarget)
     {
       crosshair.target_x = linetarget->x;
       crosshair.target_y = linetarget->y;
@@ -2348,7 +2348,7 @@ void HU_draw_crosshair(void)
       return;
     }
   }
-
+  
   SetCrosshairTarget();
 
   if (crosshair.target_screen_x != 0)

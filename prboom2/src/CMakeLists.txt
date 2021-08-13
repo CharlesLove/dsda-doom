@@ -61,6 +61,10 @@ set(COMMON_SRC
     dsda/settings.h
     dsda/split_tracker.c
     dsda/split_tracker.h
+    dsda/sprite.c
+    dsda/sprite.h
+    dsda/state.c
+    dsda/state.h
     dsda/tas.c
     dsda/tas.h
     dsda/text_file.c

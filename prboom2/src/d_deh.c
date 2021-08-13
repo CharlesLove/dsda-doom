@@ -56,6 +56,9 @@
 // CPhipps - modify to use logical output routine
 #include "lprintf.h"
 
+#include "dsda/sprite.h"
+#include "dsda/state.h"
+
 #define TRUE 1
 #define FALSE 0
 
@@ -1320,7 +1323,7 @@ static const struct deh_flag_s deh_weaponflags_mbf21[] = {
 // that Dehacked uses and is useless to us.
 // * states are base zero and have a dummy #0 (TROO)
 
-static const char *deh_state[] = // CPhipps - static const*
+static const char *deh_state_fields[] = // CPhipps - static const*
 {
   "Sprite number",    // .sprite (spritenum_t) // an enum
   "Sprite subnumber", // .frame (long)
@@ -1346,40 +1349,8 @@ static const struct deh_flag_s deh_stateflags_mbf21[] = {
   { NULL }
 };
 
-// SFXINFO_STRUCT - Dehacked block name = "Sounds"
-// Sound effects, typically not changed (redirected, and new sfx put
-// into the pwad, but not changed here.  Can you tell that Gregdidn't
-// know what they were for, mostly?  Can you tell that I don't either?
-// Mostly I just put these into the same slots as they are in the struct.
-// This may not be supported in our -deh option if it doesn't make sense by then.
-
-// * sounds are base zero but have a dummy #0
-
-static const char *deh_sfxinfo[] = // CPhipps - static const*
-{
-  "Offset",     // pointer to a name string, changed in text
-  "Zero/One",   // .singularity (int, one at a time flag)
-  "Value",      // .priority
-  "Zero 1",     // .link (sfxinfo_t*) referenced sound if linked
-  "Zero 2",     // .pitch
-  "Zero 3",     // .volume
-  "Zero 4",     // .data (SAMPLE*) sound data
-  "Neg. One 1", // .usefulness
-  "Neg. One 2"  // .lumpnum
-};
-
 // MUSICINFO is not supported in Dehacked.  Ignored here.
 // * music entries are base zero but have a dummy #0
-
-// SPRITE - Dehacked block name = "Sprite"
-// Usage = Sprite nn
-// Sprite redirection by offset into the text area - unsupported by BOOM
-// * sprites are base zero and dehacked uses it that way.
-
-// static const char *deh_sprite[] = // CPhipps - static const*
-// {
-//   "Offset"      // supposed to be the offset into the text section
-// };
 
 // AMMO - Dehacked block name = "Ammo"
 // usage = Ammo n (name)
@@ -1581,14 +1552,7 @@ static const deh_bexptr deh_bexptrs[] = // CPhipps - static const
   {NULL,              "A_NULL"},  // Ty 05/16/98
 };
 
-static byte *defined_codeptr_args;
-
-// to hold startup code pointers from INFO.C
-// CPhipps - static
-static actionf_t deh_codeptr[NUMSTATES];
-
-// haleyjd: support for BEX SPRITES, SOUNDS, and MUSIC
-char *deh_spritenames[NUMSPRITES + 1];
+// haleyjd: support for BEX SOUNDS and MUSIC
 char *deh_musicnames[DOOM_NUMMUSIC + 1];
 char *deh_soundnames[NUMSFX + 1];
 
@@ -1597,27 +1561,6 @@ void D_BuildBEXTables(void)
   int i;
 
   if (raven) return;
-
-  // moved from ProcessDehFile, then we don't need the static int i
-  for (i = 0; i < EXTRASTATES; i++)  // remember what they start as for deh xref
-    deh_codeptr[i] = states[i].action;
-
-  // initialize extra dehacked states
-  for ( ; i < num_states; i++)
-  {
-    states[i].sprite = SPR_TNT1;
-    states[i].frame = 0;
-    states[i].tics = -1;
-    states[i].action = NULL;
-    states[i].nextstate = i;
-    states[i].misc1 = 0;
-    states[i].misc2 = 0;
-    deh_codeptr[i] = states[i].action;
-  }
-
-  for (i = 0; i < num_sprites; i++)
-    deh_spritenames[i] = strdup(sprnames[i]);
-  deh_spritenames[num_sprites] = NULL;
 
   for (i = 1; i < num_music; i++)
     deh_musicnames[i] = strdup(S_music[i].name);
@@ -1702,6 +1645,8 @@ void deh_applyCompatibility(void)
 // killough 10/98:
 // substantially modified to allow input from wad lumps instead of .deh files.
 
+static int processed_dehacked;
+
 void ProcessDehFile(const char *filename, const char *outfilename, int lumpnum)
 {
   DEHFILE infile, *filein = &infile;    // killough 10/98
@@ -1710,8 +1655,7 @@ void ProcessDehFile(const char *filename, const char *outfilename, int lumpnum)
   static unsigned last_block;
   static long filepos;
 
-  if (!defined_codeptr_args)
-    defined_codeptr_args = calloc(NUMSTATES, sizeof(*defined_codeptr_args));
+  processed_dehacked = true;
 
   // Open output file if we're writing output
   if (outfilename && *outfilename && !deh_log_file)
@@ -1865,6 +1809,7 @@ static void deh_procBexCodePointers(DEHFILE *fpin, char *line)
   char mnemonic[DEH_MAXKEYLEN];  // to hold the codepointer mnemonic
   int i; // looper
   dboolean found; // know if we found this one during lookup or not
+  dsda_deh_state_t deh_state;
 
   // Ty 05/16/98 - initialize it to something, dummy!
   strncpy(inbuffer, line, DEH_BUFFERMAX - 1);
@@ -1884,13 +1829,15 @@ static void deh_procBexCodePointers(DEHFILE *fpin, char *line)
     }
 
     deh_log("Processing pointer at index %d: %s\n", indexnum, mnemonic);
-    if (indexnum < 0 || indexnum >= num_states)
+    if (indexnum < 0)
     {
-      deh_log("Bad pointer number %d of %d\n", indexnum, num_states);
+      deh_log("Pointer number must be positive (%d)\n", indexnum);
       return; // killough 10/98: fix SegViol
     }
     strcpy(key, "A_");  // reusing the key area to prefix the mnemonic
     strcat(key, ptr_lstrip(mnemonic));
+
+    deh_state = dsda_GetDehState(indexnum);
 
     found = FALSE;
     i= -1; // incremented to start at zero at the top of the loop
@@ -1899,7 +1846,7 @@ static void deh_procBexCodePointers(DEHFILE *fpin, char *line)
       ++i;
       if (!stricmp(key, deh_bexptrs[i].lookup))
       {  // Ty 06/01/98  - add  to states[].action for new djgcc version
-        states[indexnum].action = deh_bexptrs[i].cptr; // assign
+        deh_state.state->action = deh_bexptrs[i].cptr; // assign
         deh_log(" - applied %s from codeptr[%d] to states[%d]\n",
                 deh_bexptrs[i].lookup, i, indexnum);
         found = TRUE;
@@ -2215,14 +2162,20 @@ static void deh_procFrame(DEHFILE *fpin, char *line)
   int indexnum;
   char *strval;
   int bGetData;
+  dsda_deh_state_t deh_state;
 
   strncpy(inbuffer, line, DEH_BUFFERMAX - 1);
 
   // killough 8/98: allow hex numbers in input:
   sscanf(inbuffer, "%s %i", key, &indexnum);
   deh_log("Processing Frame at index %d: %s\n", indexnum, key);
-  if (indexnum < 0 || indexnum >= num_states)
-    deh_log("Bad frame number %d of %d\n",indexnum, num_states);
+  if (indexnum < 0)
+  {
+    deh_log("Frame number must be positive (%d)\n", indexnum);
+    return;
+  }
+
+  deh_state = dsda_GetDehState(indexnum);
 
   while (!dehfeof(fpin) && *inbuffer && (*inbuffer != ' '))
   {
@@ -2236,90 +2189,90 @@ static void deh_procFrame(DEHFILE *fpin, char *line)
       continue;
     }
 
-    if (!deh_strcasecmp(key, deh_state[0]))  // Sprite number
+    if (!deh_strcasecmp(key, deh_state_fields[0]))  // Sprite number
     {
       deh_log(" - sprite = %ld\n", (long)value);
-      states[indexnum].sprite = (spritenum_t)value;
+      deh_state.state->sprite = (spritenum_t)value;
     }
-    else if (!deh_strcasecmp(key, deh_state[1]))  // Sprite subnumber
+    else if (!deh_strcasecmp(key, deh_state_fields[1]))  // Sprite subnumber
     {
       deh_log(" - frame = %ld\n", (long)value);
-      states[indexnum].frame = (long)value; // long
+      deh_state.state->frame = (long)value; // long
     }
-    else if (!deh_strcasecmp(key, deh_state[2]))  // Duration
+    else if (!deh_strcasecmp(key, deh_state_fields[2]))  // Duration
     {
       deh_log(" - tics = %ld\n", (long)value);
-      states[indexnum].tics = (long)value; // long
+      deh_state.state->tics = (long)value; // long
     }
-    else if (!deh_strcasecmp(key, deh_state[3]))  // Next frame
+    else if (!deh_strcasecmp(key, deh_state_fields[3]))  // Next frame
     {
       deh_log(" - nextstate = %ld\n", (long)value);
-      states[indexnum].nextstate = (statenum_t)value;
+      deh_state.state->nextstate = (statenum_t)value;
     }
-    else if (!deh_strcasecmp(key, deh_state[4]))  // Codep frame (not set in Frame deh block)
+    else if (!deh_strcasecmp(key, deh_state_fields[4]))  // Codep frame (not set in Frame deh block)
     {
       deh_log(" - codep, should not be set in Frame section!\n");
       /* nop */ ;
     }
-    else if (!deh_strcasecmp(key, deh_state[5]))  // Unknown 1
+    else if (!deh_strcasecmp(key, deh_state_fields[5]))  // Unknown 1
     {
       deh_log(" - misc1 = %ld\n", (long)value);
-      states[indexnum].misc1 = (long)value; // long
+      deh_state.state->misc1 = (long)value; // long
     }
-    else if (!deh_strcasecmp(key, deh_state[6]))  // Unknown 2
+    else if (!deh_strcasecmp(key, deh_state_fields[6]))  // Unknown 2
     {
       deh_log(" - misc2 = %ld\n", (long)value);
-      states[indexnum].misc2 = (long)value; // long
+      deh_state.state->misc2 = (long)value; // long
     }
-    else if (!deh_strcasecmp(key, deh_state[7]))  // Args1
+    else if (!deh_strcasecmp(key, deh_state_fields[7]))  // Args1
     {
       deh_log(" - args[0] = %lld\n", (statearg_t)value);
-      states[indexnum].args[0] = (statearg_t)value;
-      defined_codeptr_args[indexnum] |= (1 << 0);
+      deh_state.state->args[0] = (statearg_t)value;
+      *deh_state.defined_codeptr_args |= (1 << 0);
     }
-    else if (!deh_strcasecmp(key, deh_state[8]))  // Args2
+    else if (!deh_strcasecmp(key, deh_state_fields[8]))  // Args2
     {
       deh_log(" - args[1] = %lld\n", (statearg_t)value);
-      states[indexnum].args[1] = (statearg_t)value;
-      defined_codeptr_args[indexnum] |= (1 << 1);
+      deh_state.state->args[1] = (statearg_t)value;
+      *deh_state.defined_codeptr_args |= (1 << 1);
     }
-    else if (!deh_strcasecmp(key, deh_state[9]))  // Args3
+    else if (!deh_strcasecmp(key, deh_state_fields[9]))  // Args3
     {
       deh_log(" - args[2] = %lld\n", (statearg_t)value);
-      states[indexnum].args[2] = (statearg_t)value;
-      defined_codeptr_args[indexnum] |= (1 << 2);
+      deh_state.state->args[2] = (statearg_t)value;
+      *deh_state.defined_codeptr_args |= (1 << 2);
     }
-    else if (!deh_strcasecmp(key, deh_state[10]))  // Args4
+    else if (!deh_strcasecmp(key, deh_state_fields[10]))  // Args4
     {
       deh_log(" - args[3] = %lld\n", (statearg_t)value);
-      states[indexnum].args[3] = (statearg_t)value;
-      defined_codeptr_args[indexnum] |= (1 << 3);
+      deh_state.state->args[3] = (statearg_t)value;
+      *deh_state.defined_codeptr_args |= (1 << 3);
     }
-    else if (!deh_strcasecmp(key, deh_state[11]))  // Args5
+    else if (!deh_strcasecmp(key, deh_state_fields[11]))  // Args5
     {
       deh_log(" - args[4] = %lld\n", (statearg_t)value);
-      states[indexnum].args[4] = (statearg_t)value;
-      defined_codeptr_args[indexnum] |= (1 << 4);
+      deh_state.state->args[4] = (statearg_t)value;
+      *deh_state.defined_codeptr_args |= (1 << 4);
     }
-    else if (!deh_strcasecmp(key, deh_state[12]))  // Args6
+    else if (!deh_strcasecmp(key, deh_state_fields[12]))  // Args6
     {
       deh_log(" - args[5] = %lld\n", (statearg_t)value);
-      states[indexnum].args[5] = (statearg_t)value;
-      defined_codeptr_args[indexnum] |= (1 << 5);
+      deh_state.state->args[5] = (statearg_t)value;
+      *deh_state.defined_codeptr_args |= (1 << 5);
     }
-    else if (!deh_strcasecmp(key, deh_state[13]))  // Args7
+    else if (!deh_strcasecmp(key, deh_state_fields[13]))  // Args7
     {
       deh_log(" - args[6] = %lld\n", (statearg_t)value);
-      states[indexnum].args[6] = (statearg_t)value;
-      defined_codeptr_args[indexnum] |= (1 << 6);
+      deh_state.state->args[6] = (statearg_t)value;
+      *deh_state.defined_codeptr_args |= (1 << 6);
     }
-    else if (!deh_strcasecmp(key, deh_state[14]))  // Args8
+    else if (!deh_strcasecmp(key, deh_state_fields[14]))  // Args8
     {
       deh_log(" - args[7] = %lld\n", (statearg_t)value);
-      states[indexnum].args[7] = (statearg_t)value;
-      defined_codeptr_args[indexnum] |= (1 << 7);
+      deh_state.state->args[7] = (statearg_t)value;
+      *deh_state.defined_codeptr_args |= (1 << 7);
     }
-    else if (!deh_strcasecmp(key, deh_state[15]))  // MBF21 Bits
+    else if (!deh_strcasecmp(key, deh_state_fields[15]))  // MBF21 Bits
     {
       if (bGetData == 1)
       {
@@ -2343,7 +2296,7 @@ static void deh_procFrame(DEHFILE *fpin, char *line)
         }
       }
 
-      states[indexnum].flags = value;
+      deh_state.state->flags = value;
     }
     else
       deh_log("Invalid frame string index for '%s'\n", key);
@@ -2364,6 +2317,7 @@ static void deh_procPointer(DEHFILE *fpin, char *line) // done
   uint_64_t value;      // All deh values are ints or longs
   int indexnum;
   size_t i; // looper
+  dsda_deh_state_t deh_state, ptr_state;
 
   strncpy(inbuffer, line, DEH_BUFFERMAX - 1);
   // NOTE: different format from normal
@@ -2376,11 +2330,13 @@ static void deh_procPointer(DEHFILE *fpin, char *line) // done
   }
 
   deh_log("Processing Pointer at index %d: %s\n", indexnum, key);
-  if (indexnum < 0 || indexnum >= num_states)
+  if (indexnum < 0)
   {
-    deh_log("Bad pointer number %d of %d\n", indexnum, num_states);
+    deh_log("Pointer number must be positive (%d)\n", indexnum);
     return;
   }
+
+  deh_state = dsda_GetDehState(indexnum);
 
   while (!dehfeof(fpin) && *inbuffer && (*inbuffer != ' '))
   {
@@ -2393,21 +2349,22 @@ static void deh_procPointer(DEHFILE *fpin, char *line) // done
       continue;
     }
 
-    if (value >= num_states)
+    if (value < 0)
     {
-      deh_log("Bad pointer number %ld of %d\n", (long)value, num_states);
+      deh_log("Pointer number must be positive (%d)\n", value);
       return;
     }
 
-    if (!deh_strcasecmp(key, deh_state[4]))  // Codep frame (not set in Frame deh block)
+    ptr_state = dsda_GetDehState(value);
+
+    if (!deh_strcasecmp(key, deh_state_fields[4]))  // Codep frame (not set in Frame deh block)
     {
-      states[indexnum].action = deh_codeptr[value];
+      deh_state.state->action = *ptr_state.codeptr;
       deh_log(" - applied from codeptr[%ld] to states[%d]\n", (long)value, indexnum);
       // Write BEX-oriented line to match:
-      // for (i=0;i<num_states;i++) could go past the end of the array
       for (i = 0; i < sizeof(deh_bexptrs) / sizeof(*deh_bexptrs); i++)
       {
-        if (!memcmp(&deh_bexptrs[i].cptr, &deh_codeptr[value], sizeof(actionf_t)))
+        if (!memcmp(&deh_bexptrs[i].cptr, ptr_state.codeptr, sizeof(actionf_t)))
         {
           deh_log("BEX [CODEPTR] -> FRAME %d = %s\n", indexnum, &deh_bexptrs[i].lookup[2]);
           break;
@@ -2453,26 +2410,25 @@ static void deh_procSounds(DEHFILE *fpin, char *line)
       deh_log("Bad data pair in '%s'\n", inbuffer);
       continue;
     }
-    if (!deh_strcasecmp(key, deh_sfxinfo[0]))  // Offset
-      /* nop */ ;  // we don't know what this is, I don't think
-    else if (!deh_strcasecmp(key, deh_sfxinfo[1]))  // Zero/One
+
+    if (!deh_strcasecmp(key, "Offset"))
+      ; // ignored
+    else if (!deh_strcasecmp(key, "Zero/One"))
       S_sfx[indexnum].singularity = (int)value;
-    else if (!deh_strcasecmp(key, deh_sfxinfo[2]))  // Value
+    else if (!deh_strcasecmp(key, "Value"))
       S_sfx[indexnum].priority = (int)value;
-    else if (!deh_strcasecmp(key, deh_sfxinfo[3]))  // Zero 1
-      //S_sfx[indexnum].link = (sfxinfo_t *)value;
-      ; // .link - don't set pointers from DeHackEd
-    else if (!deh_strcasecmp(key, deh_sfxinfo[4]))  // Zero 2
+    else if (!deh_strcasecmp(key, "Zero 1"))
+      ; // ignored
+    else if (!deh_strcasecmp(key, "Zero 2"))
       S_sfx[indexnum].pitch = (int)value;
-    else if (!deh_strcasecmp(key, deh_sfxinfo[5]))  // Zero 3
+    else if (!deh_strcasecmp(key, "Zero 3"))
       S_sfx[indexnum].volume = (int)value;
-    else if (!deh_strcasecmp(key, deh_sfxinfo[6]))  // Zero 4
-      //S_sfx[indexnum].data = (void *) value; // killough 5/3/98: changed cast
-      ; // .data - don't set pointers from DeHackEd
-    else if (!deh_strcasecmp(key, deh_sfxinfo[7]))  // Neg. One 1
-      S_sfx[indexnum].usefulness = (int)value;
-    else if (!deh_strcasecmp(key, deh_sfxinfo[8]))  // Neg. One 2
-      S_sfx[indexnum].lumpnum = (int)value;
+    else if (!deh_strcasecmp(key, "Zero 4"))
+      ; // ignored
+    else if (!deh_strcasecmp(key, "Neg. One 1"))
+      ; // ignored
+    else if (!deh_strcasecmp(key, "Neg. One 2"))
+      ; // ignored
     else
       deh_log("Invalid sound string index for '%s'\n", key);
   }
@@ -2890,7 +2846,6 @@ static void deh_procText(DEHFILE *fpin, char *line)
   // BOSSBOS2  BOS2BOSS;   RUNNINSTALKS  STALKSRUNNIN
   // It corrects buggy behaviour on "All Hell is Breaking Loose" TC
   // http://www.doomworld.com/idgames/index.php?id=6480
-  static dboolean sprnames_state[NUMSPRITES+1];
   static dboolean S_sfx_state[NUMSFX];
   static dboolean S_music_state[DOOM_NUMMUSIC];
 
@@ -2924,31 +2879,20 @@ static void deh_procText(DEHFILE *fpin, char *line)
   // Future: this will be from a separate [SPRITES] block.
   if (fromlen == 4 && tolen == 4)
   {
-    i = 0;
-    while (sprnames[i])  // null terminated list in info.c //jff 3/19/98
-    {                                                      //check pointer
-      if (!strnicmp(sprnames[i], inbuffer, fromlen) && !sprnames_state[i])         //not first char
-      {
-        deh_log("Changing name of sprite at index %d from %s to %*s\n",
-                i, sprnames[i], tolen, &inbuffer[fromlen]);
-        // Ty 03/18/98 - not using strdup because length is fixed
+    i = dsda_GetDehSpriteIndex(inbuffer);
 
-        // killough 10/98: but it's an array of pointers, so we must
-        // use strdup unless we redeclare sprnames and change all else
-        {
-          // CPhipps - fix constness problem
-          char *s;
-          sprnames[i] = s = strdup(sprnames[i]);
+    if (i >= 0)
+    {
+      char *s;
 
-          //e6y: flag the sprite as changed
-          sprnames_state[i] = true;
+      deh_log("Changing name of sprite at index %d from %s to %*s\n",
+              i, sprnames[i], tolen, &inbuffer[fromlen]);
 
-          strncpy(s, &inbuffer[fromlen], tolen);
-        }
-        found = TRUE;
-        break;  // only one will match--quit early
-      }
-      ++i;  // next array element
+      // CPhipps - fix constness problem
+      sprnames[i] = s = strdup(sprnames[i]);
+      strncpy(s, &inbuffer[fromlen], tolen);
+
+      found = TRUE;
     }
   }
 
@@ -3211,7 +3155,7 @@ static void deh_procBexSprites(DEHFILE *fpin, char *line)
   uint_64_t value;    // All deh values are ints or longs
   char *strval;  // holds the string value of the line
   char candidate[5];
-  int  rover;
+  int  match;
 
   deh_log("Processing sprite name substitution\n");
 
@@ -3240,17 +3184,11 @@ static void deh_procBexSprites(DEHFILE *fpin, char *line)
       continue;
     }
 
-    rover = 0;
-    while (deh_spritenames[rover])
+    match = dsda_GetOriginalSpriteIndex(key);
+    if (match >= 0)
     {
-      if (!strncasecmp(deh_spritenames[rover], key, 4))
-      {
-        deh_log("Substituting '%s' for sprite '%s'\n", candidate, deh_spritenames[rover]);
-
-        sprnames[rover] = strdup(candidate);
-        break;
-      }
-      rover++;
+      deh_log("Substituting '%s' for sprite '%s'\n", candidate, key);
+      sprnames[match] = strdup(candidate);
     }
   }
 }
@@ -3518,8 +3456,10 @@ void PostProcessDeh(void)
   )
     I_Error("Mismatch between bfgcells and bfg ammo per shot modifications! Check your dehacked.");
 
-  if (defined_codeptr_args)
+  if (processed_dehacked)
   {
+    extern byte* defined_codeptr_args;
+
     for (i = 0; i < num_states; i++)
     {
       bexptr_match = &null_bexptr;
@@ -3555,7 +3495,8 @@ void PostProcessDeh(void)
         states[i].args[2] = deh_translate_bits(states[i].args[2], deh_mobjflags_mbf21);
       }
     }
-
-    free(defined_codeptr_args);
   }
+
+  dsda_FreeDehStates();
+  dsda_FreeDehSprites();
 }

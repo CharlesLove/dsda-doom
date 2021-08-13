@@ -352,7 +352,7 @@ void gld_Init(int width, int height)
   lprintf(LO_INFO,"GL_VENDOR: %s\n",glGetString(GL_VENDOR));
   lprintf(LO_INFO,"GL_RENDERER: %s\n",glGetString(GL_RENDERER));
   lprintf(LO_INFO,"GL_VERSION: %s\n",glGetString(GL_VERSION));
-  lprintf(LO_INFO,"GL_EXTENSIONS:\n");
+  lprintf(LO_DEBUG,"GL_EXTENSIONS:\n");
   {
     char ext_name[256];
     const char *extensions = (const char*)glGetString(GL_EXTENSIONS);
@@ -373,7 +373,7 @@ void gld_Init(int width, int height)
         len = MIN(len, sizeof(ext_name)-1);
         memset(ext_name, 0, sizeof(ext_name));
         strncpy(ext_name, rover, len);
-        lprintf(LO_INFO,"\t%s\n", ext_name);
+        lprintf(LO_DEBUG,"\t%s\n", ext_name);
       }
       rover = p;
       while (*rover && *rover == ' ')
@@ -2619,7 +2619,7 @@ void gld_ProjectSprite(mobj_t* thing, int lightlevel)
 
   // decide which patch to use for sprite relative to player
 #ifdef RANGECHECK
-  if ((unsigned) thing->sprite >= (unsigned)numsprites)
+  if ((unsigned) thing->sprite >= (unsigned)num_sprites)
     I_Error ("R_ProjectSprite: Invalid sprite number %i", thing->sprite);
 #endif
 

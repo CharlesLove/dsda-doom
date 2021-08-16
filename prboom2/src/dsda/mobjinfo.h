@@ -12,18 +12,21 @@
 // GNU General Public License for more details.
 //
 // DESCRIPTION:
-//	DSDA SFX
+//	DSDA Mobj Info
 //
 
-#ifndef __DSDA_SFX__
-#define __DSDA_SFX__
+#ifndef __DSDA_MOBJ_INFO__
+#define __DSDA_MOBJ_INFO__
 
-#include "sounds.h"
+#include "info.h"
 
-int dsda_GetDehSFXIndex(const char* key, size_t length);
-int dsda_GetOriginalSFXIndex(const char* key);
-sfxinfo_t* dsda_GetDehSFX(int index);
-void dsda_InitializeSFX(sfxinfo_t* source, int count);
-void dsda_FreeDehSFX(void);
+typedef struct {
+  mobjinfo_t* info;
+  byte* edited_bits;
+} dsda_deh_mobjinfo_t;
+
+dsda_deh_mobjinfo_t dsda_GetDehMobjInfo(int index);
+void dsda_InitializeMobjInfo(int zero, int max, int count);
+void dsda_FreeDehMobjInfo(void);
 
 #endif

@@ -4,7 +4,7 @@ This is my personal fork of dsda-doom with minor alterations to fit my preferenc
 ### My Additions
 - The -pistolstart parameter has been ported from prboom+ um.
 - Restarting the map while pistol starting no longer clears the total time.
-- View bob and weapon sway are now separate toggles. (no longer are the two tied together)
+- View bob and weapon sway are now separate toggles.
 - Option to only display crosshair when a monster is targeted.
 - When extended hud is enabled, the current map name is displayed as well.
 - Spectres and other shadow creatures can now be targeted by the crosshair. The crosshair won't snap to their position however.

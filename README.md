@@ -5,9 +5,9 @@ This is my personal fork of dsda-doom with minor alterations to fit my preferenc
 - The -pistolstart parameter has been ported from prboom+ um.
 - Restarting the map while pistol starting no longer clears the total time.
 - View bob and weapon sway are now separate toggles. (no longer are the two tied together)
-- Option to only display crosshair on target.
+- Option to only display crosshair when a monster is targeted.
 - When extended hud is enabled, the current map name is displayed as well.
-- Spectres and other shadow creatures can now be targetted by the crosshair. The crosshair won't snap to their position however.
+- Spectres and other shadow creatures can now be targeted by the crosshair. The crosshair won't snap to their position however.
 - Smart Vertical Sync: V-sync is now only enabled for video configurations where screen tearing is an issue. A cap of 500fps has been put in place globally when v-sync is not active.
 
 # From the original dsda-doom project

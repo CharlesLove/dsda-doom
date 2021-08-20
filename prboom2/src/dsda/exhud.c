@@ -145,32 +145,66 @@ void dsda_UpdateExHud(void) {
     kill_percent_color = (kill_percent_count >= totalkills ? 0x30 + g_cr_blue : 0x30 + g_cr_gold);
     kill_percent = (totalkills == 0 ? 100 : kill_percent_count * 100 / totalkills);
     if (playerscount < 2) {
-      snprintf(
-        dsda_exhud_max_totals.msg,
-        sizeof(dsda_exhud_max_totals.msg),
-        "\x1b%cK \x1b%c%d/%d \x1b%c%d%% \x1b%cI \x1b%c%d/%d \x1b%cS \x1b%c%d/%d",
-        0x30 + g_cr_red,
-        killcolor, fullkillcount, max_kill_requirement,
-        kill_percent_color, kill_percent,
-        0x30 + g_cr_red,
-        itemcolor, players[displayplayer].itemcount, totalitems,
-        0x30 + g_cr_red,
-        secretcolor, fullsecretcount, totalsecret
-      );
+      if(!dsda_HideTotals())
+      {
+        snprintf(
+          dsda_exhud_max_totals.msg,
+          sizeof(dsda_exhud_max_totals.msg),
+          "\x1b%cK \x1b%c%d/%d \x1b%c%d%% \x1b%cI \x1b%c%d/%d \x1b%cS \x1b%c%d/%d",
+          0x30 + g_cr_red,
+          killcolor, fullkillcount, max_kill_requirement,
+          kill_percent_color, kill_percent,
+          0x30 + g_cr_red,
+          itemcolor, players[displayplayer].itemcount, totalitems,
+          0x30 + g_cr_red,
+          secretcolor, fullsecretcount, totalsecret
+        );
+      }
+      else
+      {
+        snprintf(
+          dsda_exhud_max_totals.msg,
+          sizeof(dsda_exhud_max_totals.msg),
+          "\x1b%cK \x1b%c%d \x1b%cI \x1b%c%d \x1b%cS \x1b%c%d",
+          0x30 + g_cr_red,
+          killcolor, fullkillcount,
+          0x30 + g_cr_red,
+          itemcolor, players[displayplayer].itemcount,
+          0x30 + g_cr_red,
+          secretcolor, fullsecretcount
+        );
+      }
     }
     else {
-      snprintf(
-        dsda_exhud_max_totals.msg,
-        sizeof(dsda_exhud_max_totals.msg),
-        "\x1b%cK %s \x1b%c%d/%d \x1b%c%d%% \x1b%cI \x1b%c%d/%d \x1b%cS %s \x1b%c%d/%d",
-        0x30 + g_cr_red,
-        allkills, killcolor, fullkillcount, max_kill_requirement,
-        kill_percent_color, kill_percent,
-        0x30 + g_cr_red,
-        itemcolor, players[displayplayer].itemcount, totalitems,
-        0x30 + g_cr_red,
-        allsecrets, secretcolor, fullsecretcount, totalsecret
-      );
+      if(!dsda_HideTotals())
+      {
+        snprintf(
+          dsda_exhud_max_totals.msg,
+          sizeof(dsda_exhud_max_totals.msg),
+          "\x1b%cK %s \x1b%c%d/%d \x1b%c%d%% \x1b%cI \x1b%c%d/%d \x1b%cS %s \x1b%c%d/%d",
+          0x30 + g_cr_red,
+          allkills, killcolor, fullkillcount, max_kill_requirement,
+          kill_percent_color, kill_percent,
+          0x30 + g_cr_red,
+          itemcolor, players[displayplayer].itemcount, totalitems,
+          0x30 + g_cr_red,
+          allsecrets, secretcolor, fullsecretcount, totalsecret
+        );
+      }
+      else
+      {
+        snprintf(
+          dsda_exhud_max_totals.msg,
+          sizeof(dsda_exhud_max_totals.msg),
+          "\x1b%cK %s \x1b%c%d \x1b%cI \x1b%c%d \x1b%cS %s \x1b%c%d",
+          0x30 + g_cr_red,
+          allkills, killcolor, fullkillcount,
+          0x30 + g_cr_red,
+          itemcolor, players[displayplayer].itemcount,
+          0x30 + g_cr_red,
+          allsecrets, secretcolor, fullsecretcount
+        );
+      }
     }
   }
 

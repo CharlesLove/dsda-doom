@@ -31,6 +31,7 @@ typedef enum {
   dsda_command_display,
   dsda_coordinate_display,
   dsda_exhud,
+  dsda_hide_totals,
   DSDA_SETTING_IDENTIFIER_COUNT
 } dsda_setting_identifier_t;
 
@@ -79,6 +80,7 @@ dboolean dsda_SkipQuitPrompt(void);
 dboolean dsda_TrackSplits(void);
 dboolean dsda_ShowSplitData(void);
 dboolean dsda_ExHud(void);
+dboolean dsda_HideTotals(void);
 dboolean dsda_CommandDisplay(void);
 dboolean dsda_CoordinateDisplay(void);
 dboolean dsda_ShowDemoAttempts(void);

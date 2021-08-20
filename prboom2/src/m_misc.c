@@ -1044,6 +1044,7 @@ default_t defaults[] =
   { "dsda_auto_key_frame_interval", { &dsda_auto_key_frame_interval }, { 1 }, 1, 600, def_int, ss_stat },
   { "dsda_auto_key_frame_depth", { &dsda_auto_key_frame_depth }, { 60 }, 0, 600, def_int, ss_stat },
   { "dsda_exhud", { (int *) &dsda_setting[dsda_exhud] }, { 0 }, 0, 1, def_bool, ss_stat },
+  { "dsda_hide_totals", { (int *) &dsda_setting[dsda_hide_totals] }, { 0 }, 0, 1, def_bool, ss_stat },
   { "dsda_wipe_at_full_speed", { &dsda_wipe_at_full_speed }, { 1 }, 0, 1, def_bool, ss_stat },
   { "dsda_show_demo_attempts", { &dsda_show_demo_attempts }, { 1 }, 0, 1, def_bool, ss_stat },
   { "dsda_fine_sensitivity", { &dsda_fine_sensitivity }, { 0 }, 0, 99, def_int, ss_stat },

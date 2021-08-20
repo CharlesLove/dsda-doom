@@ -2,7 +2,7 @@ module Utility
   extend self
 
   def play_demo(lmp:, iwad: "DOOM2.WAD", pwad: nil, extra: nil)
-    command = "./build/dsda-doom.exe -iwad spec/support/wads/#{iwad}"
+    command = "./build/fdwl.exe -iwad spec/support/wads/#{iwad}"
     command << " -file spec/support/wads/#{pwad}" if pwad
     command << " -fastdemo spec/support/lmps/#{lmp}"
     command << " -nosound -nomusic -nodraw -levelstat -analysis"

@@ -14,7 +14,7 @@ static LauncherApp *LApp;
 
 - (NSString *)wadPath
 {
-	return [@"~/.dsda-doom" stringByExpandingTildeInPath];
+	return [@"~/.fdwl" stringByExpandingTildeInPath];
 }
 
 - (void)awakeFromNib

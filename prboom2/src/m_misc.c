@@ -1489,7 +1489,7 @@ void M_LoadDefaults (void)
 
   // check for a custom default file
 
-#define BOOM_CFG "dsda-doom.cfg"
+#define BOOM_CFG "fdwl.cfg"
 
   i = M_CheckParm ("-config");
   if (i && i < myargc-1)

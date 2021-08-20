@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project("dsda-doom" VERSION 0.20.1)
+project("From Doom With Love" VERSION 2021.08.19)
 
 # Set a default build type if none was specified
 set(default_build_type "RelWithDebInfo")
@@ -32,8 +32,8 @@ endif()
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../dependencies_${DEPENDENCY_SUFFIX}")
 
 set(PACKAGE_NAME "${PROJECT_NAME}")
-set(PACKAGE_TARNAME "dsda-doom")
-set(WAD_DATA "dsda-doom.wad")
+set(PACKAGE_TARNAME "fdwl")
+set(WAD_DATA "fdwl.wad")
 set(PACKAGE_VERSION "${PROJECT_VERSION}")
 set(PACKAGE_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
 set(CMAKE_INSTALL_DOCDIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/${PACKAGE_TARNAME}" CACHE PATH "" FORCE)

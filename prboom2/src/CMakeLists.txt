@@ -462,15 +462,15 @@ function(AddGameExecutable TARGET SOURCES)
         target_include_directories(${TARGET} PRIVATE ${PORTMIDI_INCLUDE_DIR})
         target_link_libraries(${TARGET} PRIVATE ${PORTMIDI_LIBRARIES})
     endif()
-    add_dependencies(${TARGET} dsda-doom-wad)
+    add_dependencies(${TARGET} fdwl-wad)
 
     if(MSVC)
         set_target_properties(${TARGET} PROPERTIES
             LINK_FLAGS "/MANIFEST:NO"
         )
         add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND "mt.exe" -manifest \"${CMAKE_CURRENT_SOURCE_DIR}\\..\\ICONS\\dsda-doom.exe.manifest\" -outputresource:\"$<TARGET_FILE:dsda-doom>\"\;\#1
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${WAD_DATA_PATH} $<TARGET_FILE_DIR:dsda-doom>
+            COMMAND "mt.exe" -manifest \"${CMAKE_CURRENT_SOURCE_DIR}\\..\\ICONS\\fdwl.exe.manifest\" -outputresource:\"$<TARGET_FILE:fdwl>\"\;\#1
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${WAD_DATA_PATH} $<TARGET_FILE_DIR:fdwl>
         )
     endif()
 
@@ -492,7 +492,7 @@ function(AddGameExecutable TARGET SOURCES)
     endif()
 endfunction()
 
-AddGameExecutable(dsda-doom "${PRBOOM_PLUS_SOURCES}")
+AddGameExecutable(fdwl "${PRBOOM_PLUS_SOURCES}")
 
 
 # DSDA-Doom server executable
@@ -597,9 +597,9 @@ if(APPLE)
         RUNTIME_OUTPUT_DIRECTORY ${PRBOOM_OUTPUT_PATH}
         XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
     )
-    add_dependencies(prboom-plus-launcher dsda-doom)
+    add_dependencies(prboom-plus-launcher fdwl)
 
-    set(BUNDLE_GAME_EXECUTABLE dsda-doom)
+    set(BUNDLE_GAME_EXECUTABLE fdwl)
 
     add_custom_command(TARGET prboom-plus-launcher POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${BUNDLE_GAME_EXECUTABLE}> $<TARGET_FILE_DIR:prboom-plus-launcher>/PrBoom-Plus

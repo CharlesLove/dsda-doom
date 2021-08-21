@@ -7,6 +7,7 @@ This is my personal fork of dsda-doom with minor alterations to fit my preferenc
 - View bob and weapon sway are now separate toggles.
 - Option to only display crosshair when a monster is targeted.
 - When extended hud is enabled, the current map name is displayed as well.
+- Option to hide totals in extended hud.
 - Spectres and other shadow creatures can now be targeted by the crosshair. The crosshair won't snap to their position however.
 - Smart Vertical Sync: V-sync is now only enabled for video configurations where screen tearing is an issue. A cap of 500fps has been put in place globally when v-sync is not active.
 

@@ -37,7 +37,7 @@ dsda_setting_t dsda_setting[DSDA_SETTING_IDENTIFIER_COUNT] = {
   [dsda_command_display] = { 0, 0, "Command Display", NULL, NULL, false, true },
   [dsda_coordinate_display] = { 0, 0, "Coordinate Display", NULL, NULL, false, true },
   [dsda_exhud] = { 0, 0, NULL, NULL, NULL, false, true },
-  [dsda_hide_totals] = { 0, 0, NULL, NULL, NULL, false, true },
+  [dsda_hide_totals] = { 0, 0, NULL, NULL, NULL, false, true }
 };
 
 int dsda_auto_key_frame_interval;

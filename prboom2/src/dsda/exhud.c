@@ -25,6 +25,8 @@
 
 #include "exhud.h"
 
+#include "settings.h"
+
 #define DSDA_EXHUD_X 2
 
 dsda_text_t dsda_exhud_timer;

@@ -656,8 +656,10 @@ void I_GetScreenResolution(void)
 static const struct {
   const int w, h;
 } canonicals[] = {
+  {848, 480}, // Crispy Hi-Res Widescreen
   {640, 480}, // Doom 95
   {640, 400}, // MBF
+  {424, 240}, // Crispy Lo-Res Widescreen
   {320, 240}, // Doom 95
   {320, 200}, // Vanilla Doom
 };
@@ -1221,7 +1223,7 @@ void I_UpdateVideoMode(void)
 
     // [FG] aspect ratio correction for the canonical video modes
     if ((SCREENWIDTH == 320 && SCREENHEIGHT == 200) ||
-        (SCREENWIDTH == 640 && SCREENHEIGHT == 400))
+        (SCREENWIDTH == 640 && SCREENHEIGHT == 400)) 
     {
       actualheight = 6*SCREENHEIGHT/5;
     }

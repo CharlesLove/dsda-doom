@@ -149,16 +149,6 @@ int ffmap;
 
 dboolean advancedemo;
 
-// Framerate Capping Variables
-// Current implementation loses some accuracy
-// at higher framerates (past 60fps)
-// Still, it does it's job of preventing 1000+ fps
-// which is unnessecarilly expensive
-int startTicks = 0;
-int endTicks = 0;
-const int MAX_FRAMES_PER_SECOND = 500; // 500 fps
-const int SCREEN_TICKS_PER_FRAME = 1000 / MAX_FRAMES_PER_SECOND;
-
 //jff 4/19/98 list of standard IWAD names
 const char *const standard_iwads[]=
 {
@@ -476,15 +466,6 @@ void D_Display (fixed_t frac)
     wipe_EndScreen();
     D_Wipe();
   }
-  
-  // Used for setting an upper limit for framerate
-  endTicks = SDL_GetTicks() - startTicks;
-  if(endTicks < SCREEN_TICKS_PER_FRAME)
-  {
-    //Wait remaining time
-    SDL_Delay(SCREEN_TICKS_PER_FRAME - endTicks);
-  }
-  startTicks = SDL_GetTicks();
   
   // e6y
   // Don't thrash cpu during pausing or if the window doesnt have focus

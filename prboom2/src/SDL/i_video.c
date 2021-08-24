@@ -656,10 +656,14 @@ void I_GetScreenResolution(void)
 static const struct {
   const int w, h;
 } canonicals[] = {
-  {848, 480}, // Crispy Hi-Res Widescreen
+  {1120, 480},// Crispy Hi-Res 21:9
+  {848, 480}, // Crispy Hi-Res 16:9
+  {768, 480}, // Crispy Hi-Res 16:10
   {640, 480}, // Doom 95
   {640, 400}, // MBF
-  {424, 240}, // Crispy Lo-Res Widescreen
+  {560, 240}, // Crispy Lo-Res 21:9
+  {424, 240}, // Crispy Lo-Res 16:9
+  {424, 240}, // Crispy Lo-Res 16:10
   {320, 240}, // Doom 95
   {320, 200}, // Vanilla Doom
 };

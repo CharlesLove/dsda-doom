@@ -1001,7 +1001,10 @@ void M_SaveSelect(int choice)
   saveSlot = choice;
   strcpy(saveOldString,savegamestrings[choice]);
   if (!strcmp(savegamestrings[choice],s_EMPTYSTRING)) // Ty 03/27/98 - externalized
-    savegamestrings[choice][0] = 0;
+  {
+    strncpy(savegamestrings[choice], MAPNAME(gameepisode, gamemap), SAVESTRINGSIZE);
+    savegamestrings[choice][SAVESTRINGSIZE - 1] = 0;
+  }
   saveCharIndex = strlen(savegamestrings[choice]);
 }
 
@@ -3197,6 +3200,7 @@ setup_menu_t gen_settings1[] = { // General Settings screen1
   {"Smart Vertical Sync",            S_YESNO,            m_null, G_X, G_Y+ 8*8, {"render_vsync"}, 0, M_ChangeVideoMode},
   {"Translucency filter percentage", S_NUM,              m_null, G_X, G_Y+ 9*8, {"tran_filter_pct"}, 0, M_Trans},
   {"Extended Framerate",             S_YESNO,            m_null, G_X, G_Y+10*8, {"uncapped_framerate"}, 0, M_ChangeUncappedFrameRate},
+  {"Subframe Limit",                 S_NUM,              m_null, G_X, G_Y+11*8, {"dsda_subframes"}},
 
   {"Sound & Music",                  S_SKIP|S_TITLE,     m_null, G_X, G_Y+12*8},
   {"Number of Sound Channels",       S_NUM|S_PRGWARN,    m_null, G_X, G_Y+13*8, {"snd_channels"}},
@@ -4551,7 +4555,14 @@ dboolean M_Responder (event_t* ev) {
     {
       if (saveCharIndex > 0)
       {
-        saveCharIndex--;
+        if (!strncmp(savegamestrings[saveSlot], MAPNAME(gameepisode, gamemap), SAVESTRINGSIZE))
+        {
+          saveCharIndex = 0;
+        }
+        else
+        {
+          saveCharIndex--;
+        }
         savegamestrings[saveSlot][saveCharIndex] = 0;
       }
     }

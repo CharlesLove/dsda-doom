@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project("From Doom With Love" VERSION 2021.08.21)
+project("From Doom With Love" VERSION 2021.08.24)
 
 # Set a default build type if none was specified
 set(default_build_type "RelWithDebInfo")

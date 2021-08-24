@@ -13,10 +13,11 @@ This is my personal fork of dsda-doom with minor alterations to fit my preferenc
 
 # From the original dsda-doom project
 ### Patch Notes
+- [v0.21](./patch_notes/v0.21.md)
 - [v0.20](./patch_notes/v0.20.md)
 - [v0.19](./patch_notes/v0.19.md)
 
-#### Hexen Support (Beta)
+#### Hexen Support (beta)
 - DSDA-Doom includes demo-compatible support for hexen.
   - Use -iwad HEXEN.WAD (-file HEXDD.WAD for the expansion)
     - Or drag wads onto the exe

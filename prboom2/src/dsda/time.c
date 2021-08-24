@@ -101,15 +101,15 @@ static void dsda_Throttle(int timer, unsigned long long target_time) {
   }
 }
 
-int dsda_subframes;
+int dsda_maxframes;
 
 void dsda_LimitFPS(void) {
   extern int movement_smooth;
 
-  if (movement_smooth && dsda_subframes) {
+  if (movement_smooth && dsda_maxframes) {
     unsigned long long target_time;
 
-    target_time = 1000000 / (dsda_subframes * 35);
+    target_time = 1000000 / (dsda_maxframes);
 
     dsda_Throttle(dsda_timer_fps, target_time);
   }

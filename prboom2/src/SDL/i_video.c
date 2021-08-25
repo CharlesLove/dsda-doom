@@ -656,15 +656,17 @@ void I_GetScreenResolution(void)
 static const struct {
   const int w, h;
 } canonicals[] = {
-  {1120, 480},// Crispy Hi-Res 21:9
-  {848, 480}, // Crispy Hi-Res 16:9
-  {768, 480}, // Crispy Hi-Res 16:10
-  {640, 480}, // Doom 95
+  {1120, 400},// Crispy Hi-Res 21:9
+  {854, 400}, // Crispy Hi-Res 16:9
+  {768, 400}, // Crispy Hi-Res 16:10
+  //{640, 480}, // Doom 95 *disabled
   {640, 400}, // MBF
-  {560, 240}, // Crispy Lo-Res 21:9
-  {424, 240}, // Crispy Lo-Res 16:9
-  {424, 240}, // Crispy Lo-Res 16:10
-  {320, 240}, // Doom 95
+  {560, 200}, // Crispy Lo-Res 21:9
+  //{426, 200}, // Crispy Lo-Res 16:9 *Broken
+  {426, 240}, // Crispy Lo-Res 16:9 *Compromise
+
+  {384, 200}, // Crispy Lo-Res 16:10
+  //{320, 240}, // Doom 95 *disabled
   {320, 200}, // Vanilla Doom
 };
 static const int num_canonicals = sizeof(canonicals)/sizeof(*canonicals);
@@ -1226,8 +1228,8 @@ void I_UpdateVideoMode(void)
     sdl_renderer = SDL_CreateRenderer(sdl_window, -1, flags);
 
     // [FG] aspect ratio correction for the canonical video modes
-    if ((SCREENWIDTH == 320 && SCREENHEIGHT == 200) ||
-        (SCREENWIDTH == 640 && SCREENHEIGHT == 400)) 
+    if ((SCREENHEIGHT == 200) ||
+        (SCREENHEIGHT == 400)) 
     {
       actualheight = 6*SCREENHEIGHT/5;
     }

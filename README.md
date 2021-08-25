@@ -9,7 +9,8 @@ This is my personal fork of dsda-doom with minor alterations to fit my preferenc
 - When extended hud is enabled, the current map name is displayed as well.
 - Option to hide totals in extended hud.
 - Spectres and other shadow creatures can now be targeted by the crosshair. The crosshair won't snap to their position however.
-- Smart Vertical Sync: V-sync is now only enabled for video configurations where screen tearing is an issue. A cap of 500fps has been put in place globally when v-sync is not active.
+- Smart Vertical Sync: V-sync is now only enabled for video configurations where screen tearing is an issue. (500fps framelimit by default)
+- 16:9, 16:10, and 21:9 200p/400p resolutions.
 
 # From the original dsda-doom project
 ### Patch Notes

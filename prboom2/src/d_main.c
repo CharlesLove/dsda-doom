@@ -97,6 +97,7 @@
 #include "dsda/global.h"
 #include "dsda/save.h"
 #include "dsda/data_organizer.h"
+#include "dsda/map_format.h"
 #include "dsda/settings.h"
 #include "dsda/time.h"
 
@@ -418,8 +419,10 @@ void D_Display (fixed_t frac)
       R_DrawViewBorder();
     HU_Drawer();
 
+#ifdef GL_DOOM
     if (V_IsOpenGLMode())
       gld_ProcessExtraAlpha();
+#endif
   }
 
   isborderstate      = isborder;
@@ -496,6 +499,9 @@ static const char *auto_shot_fname;
 
 static void D_DoomLoop(void)
 {
+  if (quickstart_window_ms > 0)
+    I_uSleep(quickstart_window_ms * 1000);
+
   for (;;)
   {
     WasRenderedInTryRunTics = false;
@@ -1027,15 +1033,18 @@ static char *FindIWADFile(void)
   int   i;
   char  * iwad  = NULL;
 
-  if (M_CheckParm("-heretic") || CheckExeSuffix("-heretic"))
-    return I_FindFile("heretic.wad", ".wad");
-  else if (M_CheckParm("-hexen") || CheckExeSuffix("-hexen"))
-    return I_FindFile("hexen.wad", ".wad");
-
   i = M_CheckParm("-iwad");
-  if (i && (++i < myargc)) {
+  if (i && (++i < myargc))
+  {
     iwad = I_FindFile(myargv[i], ".wad");
-  } else {
+  }
+  else
+  {
+    if (M_CheckParm("-heretic") || CheckExeSuffix("-heretic"))
+      return I_FindFile("heretic.wad", ".wad");
+    else if (M_CheckParm("-hexen") || CheckExeSuffix("-hexen"))
+      return I_FindFile("hexen.wad", ".wad");
+
     for (i=0; !iwad && i<nstandard_iwads; i++)
       iwad = I_FindFile(standard_iwads[i], ".wad");
   }
@@ -1635,7 +1644,7 @@ static void HandleWarp(void)
     startmap = 0; // Ty 08/29/98 - allow "-warp x" to go to first map in wad(s)
     autostart = true; // Ty 08/29/98 - move outside the decision tree
 
-    if (hexen)
+    if (map_format.mapinfo)
     {
       if (p < myargc - 1)
         startmap = P_TranslateMap(atoi(myargv[p + 1]));
@@ -1900,12 +1909,8 @@ static void D_DoomMainSetup(void)
   //e6y: some stuff from command-line should be initialised before ProcessDehFile()
   e6y_InitCommandLine();
 
-  // Automatic pistol start when advancing from one level to the next. At the
-  // beginning of each level, the player's health is reset to 100, their
-  // armor to 0 and their inventory is reduced to the following: pistol,
-  // fists and 50 bullets.
-
-  pistolstart = M_CheckParm("-pistolstart");
+  // Automatic pistol start when advancing from one level to the next.
+  pistolstart = M_CheckParm("-pistolstart") || M_CheckParm("-wandstart");
 
   // CPhipps - autoloading of wads
   // Designed to be general, instead of specific to boomlump.wad
@@ -2164,6 +2169,8 @@ static void D_DoomMainSetup(void)
 
   PostProcessDeh();
 
+  dsda_DetectMapFormat();
+
   V_InitColorTranslation(); //jff 4/24/98 load color translation lumps
 
   // killough 2/22/98: copyright / "modified game" / SPA banners removed
@@ -2182,10 +2189,18 @@ static void D_DoomMainSetup(void)
   lprintf(LO_INFO,"M_Init: Init miscellaneous info.\n");
   M_Init();
 
-  if (hexen)
+  if (map_format.mapinfo)
   {
     InitMapMusicInfo();
+  }
+
+  if (map_format.sndinfo)
+  {
     S_InitScript();
+  }
+
+  if (map_format.sndseq)
+  {
     SN_InitSequenceScript();
   }
 
@@ -2302,7 +2317,7 @@ static void D_DoomMainSetup(void)
       {
         GetFirstMap(&startepisode, &startmap);
       }
-      if (hexen)
+      if (map_format.mapinfo)
       {
         G_StartNewInit();
       }
@@ -2349,7 +2364,7 @@ void GetFirstMap(int *ep, int *map)
   {
     *ep = 1;
     *map = 1; // default E1M1 or MAP01
-    if (hexen)
+    if (map_format.mapinfo)
     {
       *map = P_TranslateMap(1);
       if (*map == -1)

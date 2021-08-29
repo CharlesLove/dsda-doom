@@ -1134,23 +1134,23 @@ static void G_DoLoadLevel (void)
   // automatic pistol start when advancing from one level to the next
   if (pistolstart)
   {
-      if (singleplayer)
-      {
-          G_PlayerReborn(0);
-      }
-      else if ((demoplayback || netdemo) && !singledemo)
-      {
-          // no-op - silently ignore pistolstart when playing demo from the
-          // demo reel
-      }
-      else
-      {
-          const char message[] = "The -pistolstart option is not supported"
-                                 " for demos and\n"
-                                 " network play.";
-          if (!demo_p) demorecording = false;
-          I_Error(message);
-      }
+    if (singleplayer)
+    {
+      G_PlayerReborn(0);
+    }
+    else if ((demoplayback || netdemo) && !singledemo)
+    {
+      // no-op - silently ignore pistolstart when playing demo from the
+      // demo reel
+    }
+    else
+    {
+      const char message[] = "The -pistolstart option is not supported"
+                             " for demos and\n"
+                             " network play.";
+      if (!demo_p) demorecording = false;
+      I_Error(message);
+    }
   }
 
   // initialize the msecnode_t freelist.                     phares 3/25/98
@@ -1468,7 +1468,7 @@ void G_Ticker (void)
               gameaction = ga_loadlevel;
               break;
           }
-          players[i].cmd.buttons = 0;
+          if (!raven) players[i].cmd.buttons = 0;
         }
       }
     }

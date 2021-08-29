@@ -1943,7 +1943,6 @@ static void D_DoomMainSetup(void)
   }
 
   // add wad files from autoload directory before wads from -file parameter
-
   if (autoload)
     D_AutoloadIWadDir();
 
@@ -2017,7 +2016,6 @@ static void D_DoomMainSetup(void)
   }
 
   // add wad files from autoload PWAD directories
-  
   if (autoload)
     D_AutoloadPWadDir();
 

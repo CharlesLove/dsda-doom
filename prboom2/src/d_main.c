@@ -2017,8 +2017,9 @@ static void D_DoomMainSetup(void)
   }
 
   // add wad files from autoload PWAD directories
-
-  D_AutoloadPWadDir();
+  
+  if (autoload)
+    D_AutoloadPWadDir();
 
   // CPhipps - move up netgame init
   //jff 9/3/98 use logical output routine

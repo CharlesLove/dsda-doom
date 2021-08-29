@@ -469,7 +469,7 @@ void D_Display (fixed_t frac)
     wipe_EndScreen();
     D_Wipe();
   }
-  
+
   // e6y
   // Don't thrash cpu during pausing or if the window doesnt have focus
   if ( (paused && !walkcamera.type) || (!window_focused) ) {
@@ -1717,6 +1717,7 @@ const char* doomverstr = NULL;
 static void D_DoomMainSetup(void)
 {
   int p,slot;
+  dboolean autoload;
 
   if (M_CheckParm("-verbose"))
     I_EnableVerboseLogging();
@@ -1916,12 +1917,13 @@ static void D_DoomMainSetup(void)
   // Designed to be general, instead of specific to boomlump.wad
   // Some people might find this useful
   // cph - support MBF -noload parameter
+  autoload = !M_CheckParm("-noload") && !M_CheckParm("-noautoload");
   {
     // only autoloaded wads here - autoloaded patches moved down below W_Init
     int i, imax = MAXLOADFILES;
 
     // make sure to always autoload prboom-plus.wad
-    if (M_CheckParm("-noload"))
+    if (!autoload)
       imax = 1;
 
     for (i=0; i<imax; i++) {
@@ -1942,7 +1944,8 @@ static void D_DoomMainSetup(void)
 
   // add wad files from autoload directory before wads from -file parameter
 
-  D_AutoloadIWadDir();
+  if (autoload)
+    D_AutoloadIWadDir();
 
   // add any files specified on the command line with -file wadfile
   // to the wad list
@@ -2084,7 +2087,7 @@ static void D_DoomMainSetup(void)
     }
   }
 
-  if (!M_CheckParm("-noload")) {
+  if (autoload) {
     // now do autoloaded dehacked patches, after IWAD patches but before PWAD
     int i;
 
@@ -2106,8 +2109,8 @@ static void D_DoomMainSetup(void)
   }
 
   // process deh files from autoload directory before deh in wads from -file parameter
-
-  D_AutoloadDehIWadDir();
+  if (autoload)
+    D_AutoloadDehIWadDir();
 
   if (!M_CheckParm ("-nodeh"))
     for (p = -1; (p = W_ListNumFromName("DEHACKED", p)) >= 0; )
@@ -2117,8 +2120,8 @@ static void D_DoomMainSetup(void)
         ProcessDehFile(NULL, D_dehout(), p);
 
   // process .deh files from PWADs autoload directories
-
-  D_AutoloadDehPWadDir();
+  if (autoload)
+    D_AutoloadDehPWadDir();
 
   // Load command line dehacked patches after WAD dehacked patches
 

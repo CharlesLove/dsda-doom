@@ -2,7 +2,7 @@
 This is my personal fork of dsda-doom with minor alterations to fit my preferences. It's kept relatively up to date with the original, although this may no longer be the case as specs evolve. Check it out on [Doomworld](https://www.doomworld.com/forum/topic/123998)
 
 ### My Additions
-- The -pistolstart parameter has been ported from prboom+ um.
+- The -pistolstart parameter has been ported from prboom+ um. (dsda-doom now includes this option)
 - Restarting the map while pistol starting no longer clears the total time.
 - View bob and weapon sway are now separate toggles.
 - Option to only display crosshair when a monster is targeted.

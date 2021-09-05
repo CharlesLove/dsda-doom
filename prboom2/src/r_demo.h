@@ -49,6 +49,7 @@
 
 extern int demo_smoothturns;
 extern int demo_smoothturnsfactor;
+extern int demo_forcedisablebob;
 
 void R_SmoothPlaying_Reset(player_t *player);
 void R_SmoothPlaying_Add(int delta);

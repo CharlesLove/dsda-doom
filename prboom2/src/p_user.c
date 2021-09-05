@@ -223,7 +223,7 @@ void P_CalcHeight (player_t* player)
 
   angle = (FINEANGLES / 20 * leveltime) & FINEMASK;
 
-  if( !player_bobbing || demo_forcedisablebob)
+  if( !player_bobbing || (demo_forcedisablebob && demoplayback))
     bob = 0;
   else
     bob = FixedMul(player->bob / 2, finesine[angle]);

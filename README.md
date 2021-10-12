@@ -1,4 +1,4 @@
-# From DOOM with LOVE v2021.09.04
+# From DOOM with LOVE v2021.10.12
 This is my personal fork of dsda-doom with minor alterations to fit my preferences. It's kept relatively up to date with the original, although this may no longer be the case as specs evolve. Check it out on [Doomworld](https://www.doomworld.com/forum/topic/123998)
 
 ### My Additions

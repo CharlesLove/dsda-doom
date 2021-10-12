@@ -668,8 +668,7 @@ static const struct {
   //{640, 480}, // Doom 95 *disabled
   {640, 400}, // MBF
   {560, 200}, // Crispy Lo-Res 21:9
-  //{426, 200}, // Crispy Lo-Res 16:9 *Broken
-  {426, 240}, // Crispy Lo-Res 16:9 *Compromise
+  {426, 200}, // Crispy Lo-Res 'almost' 16:9
 
   {384, 200}, // Crispy Lo-Res 16:10
   //{320, 240}, // Doom 95 *disabled

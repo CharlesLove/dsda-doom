@@ -1279,7 +1279,7 @@ void SetRatio(int width, int height)
     ratio_multiplier = 4;
     ratio_scale = 3;
   }
-  else if ((width == 426 && height == 200) || (width == 854 && height == 400))
+  else if ((width == 854 && height == 400))
   {
     ratio_multiplier = 16;
     ratio_scale = 9;
@@ -1293,6 +1293,12 @@ void SetRatio(int width, int height)
   {
     ratio_multiplier = 21;
     ratio_scale = 9;
+  }
+  // Incredibly close to 16:9
+  else if ((width == 426 && height == 200))
+  {
+    ratio_multiplier = 1775;
+    ratio_scale = 1000;
   }
   else
   {

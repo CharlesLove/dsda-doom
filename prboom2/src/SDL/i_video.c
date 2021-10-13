@@ -663,12 +663,12 @@ static const struct {
   const int w, h;
 } canonicals[] = {
   {1120, 400},// Crispy Hi-Res 21:9
-  {854, 400}, // Crispy Hi-Res 16:9
+  {852, 400}, // Crispy Hi-Res 'almost' 16:9 (actually 1.775:1)
   {768, 400}, // Crispy Hi-Res 16:10
   //{640, 480}, // Doom 95 *disabled
   {640, 400}, // MBF
   {560, 200}, // Crispy Lo-Res 21:9
-  {426, 200}, // Crispy Lo-Res 'almost' 16:9
+  {426, 200}, // Crispy Lo-Res 'almost' 16:9 (actually 1.775:1)
 
   {384, 200}, // Crispy Lo-Res 16:10
   //{320, 240}, // Doom 95 *disabled
